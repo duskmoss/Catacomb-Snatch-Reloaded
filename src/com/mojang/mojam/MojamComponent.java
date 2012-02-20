@@ -175,7 +175,7 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	private synchronized void createLevel() {
 		try {
-			level = Level.fromFile("/levels/level1.bmp");
+			level = Level.fromFile("/levels/level2.bmp");
 		} catch (Exception ex) {
 			throw new RuntimeException("Unable to load level", ex);
 		}

@@ -2,7 +2,6 @@ package com.mojang.mojam.network;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Random;
 
 import com.mojang.mojam.network.packet.TurnPacket;
 

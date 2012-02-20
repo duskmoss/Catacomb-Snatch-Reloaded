@@ -288,8 +288,10 @@ public class Player extends Mob implements LootCollector {
 			if (keys.use.wasPressed()) {
 				Vec2 buildPos = pos.clone();
 				Tile tile = level.getTile(buildPos);
-				// if (tile != null && tile.isBuildable()) {
-				boolean allowed = true;
+				boolean allowed=false;
+				if (tile != null && tile.isBuildable()) {
+					allowed = true;
+				}
 				/*
 				 * for (Entity e : level.getEntities(x -
 				 * Building.MIN_BUILDING_DISTANCE, y -
