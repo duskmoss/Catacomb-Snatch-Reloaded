@@ -286,10 +286,10 @@ public class Level {
 
 	public Set<Entity> getEntities(double xx0, double yy0, double xx1,
 			double yy1, Class<? extends Entity> c) {
-		int x0 = (int) (xx0) / Tile.WIDTH;
-		int x1 = (int) ((xx1) / Tile.WIDTH)+1;
-		int y0 = (int) (yy0) / Tile.HEIGHT;
-		int y1 = (int) ((yy1) / Tile.HEIGHT)+1;
+		int x0 = (int) ((xx0) / Tile.WIDTH)-1;
+		int x1 = (int) ((xx1) / Tile.WIDTH);
+		int y0 = (int) ((yy0) / Tile.HEIGHT)-1;
+		int y1 = (int) ((yy1) / Tile.HEIGHT);
 
 		Set<Entity> result = new TreeSet<Entity>(new EntityComparator());
 

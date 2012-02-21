@@ -85,6 +85,9 @@ public class Harvester extends Building implements LootCollector {
 						Art.fxSteam12, 30));
 			}
 		}
+		if (health == 0) {
+			dropAllMoney();
+		}
 	}
 
 	@Override
@@ -149,9 +152,7 @@ public class Harvester extends Building implements LootCollector {
 			screen.blit(image, pos.x - image.w / 2, pos.y - image.h + 8);
 		}
 
-		if (health == 0) {
-			dropAllMoney();
-		}
+		
 	}
 
 	@Override

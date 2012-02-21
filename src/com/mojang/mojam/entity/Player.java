@@ -64,7 +64,7 @@ public class Player extends Mob implements LootCollector {
 		startX = x;
 		startY = y;
 
-		score = 0;
+		score = 100000;
 
 	}
 
