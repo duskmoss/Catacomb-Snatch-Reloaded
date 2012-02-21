@@ -9,31 +9,40 @@ import com.mojang.mojam.screen.Screen;
 
 public class Button extends GuiComponent {
 
-	private List<ButtonListener> listeners;
+	protected List<ButtonListener> listeners;
 
-	private boolean isPressed;
+	protected boolean isPressed;
 
-	private final int x;
-	private final int y;
-	private final int w;
-	private final int h;
+	protected final int x;
+	protected final int y;
+	protected int width;
+	protected int heigth;
 
-	private final int id;
+	protected final int id;
+	
+	protected boolean performClick = false;
+	
+	
 
 	private int ix;
 
 	private int iy;
-	private boolean performClick = false;
+	
 
-	public Button(int id, int buttonImageIndex, int x, int y) {
+	public Button(int id, int x, int y){
 		this.id = id;
 		this.x = x;
 		this.y = y;
-		this.w = 128;
-		this.h = 24;
+	}
+	
+	public Button(int id, int buttonImageIndex, int x, int y) {
+		this(id, x, y);
+		this.width = 128;
+		this.heigth = 24;
 		this.ix = buttonImageIndex % 2;
 		this.iy = buttonImageIndex / 2;
 	}
+	
 
 	@Override
 	public void tick(MouseButtons mouseButtons) {
@@ -42,27 +51,26 @@ public class Button extends GuiComponent {
 		int mx = mouseButtons.getX() / 2;
 		int my = mouseButtons.getY() / 2;
 		isPressed = false;
-		if (mx >= x && my >= y && mx < (x + w) && my < (y + h)) {
+		if (mx >= x && my >= y && mx < (x + width) && my < (y + heigth)) {
 			if (mouseButtons.isRelased(1)) {
 				postClick();
 			} else if (mouseButtons.isDown(1)) {
 				isPressed = true;
 			}
 		}
-
 		if (performClick) {
-			if (listeners != null) {
-				for (ButtonListener listener : listeners) {
-					listener.buttonPressed(this);
-				}
-			}
-			performClick = false;
-		}
-	}
+            if (listeners != null) {
+                for (ButtonListener listener : listeners) {
+                    listener.buttonPressed(this);
+                }
+            }
+            performClick = false;
+        }
+    }
 
-	public void postClick() {
-		performClick = true;
-	}
+    public void postClick() {
+        performClick = true;
+    }
 
 	@Override
 	public void render(Screen screen) {

@@ -10,8 +10,19 @@ import com.mojang.mojam.screen.Screen;
 public abstract class GuiMenu extends GuiComponent implements ButtonListener,
 		KeyListener {
 
+	
+	protected int LAST_ITEM;
+	protected int FIRST_ITEM;
+	
+	public GuiMenu(){
+		LAST_ITEM = 0 ;
+		FIRST_ITEM = 0;
+	}
+	
 	protected List<Button> buttons = new ArrayList<Button>();
 
+	
+	
 	protected Button addButton(Button button) {
 		buttons.add(button);
 		button.addListener(this);

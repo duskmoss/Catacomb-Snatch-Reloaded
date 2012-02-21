@@ -51,7 +51,7 @@ public class TurnSynchronizer {
 		synchedRandom.setSeed(synchedSeed);
 
 	}
-
+	
 	public int getLocalTick() {
 		return turnSequence;
 	}

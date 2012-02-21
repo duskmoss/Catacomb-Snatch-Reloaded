@@ -30,10 +30,12 @@ import com.mojang.mojam.entity.building.Base;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.ButtonListener;
+import com.mojang.mojam.gui.CheckBox;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.gui.GuiMenu;
 import com.mojang.mojam.gui.HostingWaitMenu;
 import com.mojang.mojam.gui.JoinGameMenu;
+import com.mojang.mojam.gui.PauseMenu;
 import com.mojang.mojam.gui.TitleMenu;
 import com.mojang.mojam.gui.WinMenu;
 import com.mojang.mojam.level.Level;
@@ -87,6 +89,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	public static SoundPlayer soundPlayer;
 
 	private int createServerState = 0;
+	private boolean showFPS;
+	private boolean paused;
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -102,6 +106,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
 		addMenu(menu);
 		addKeyListener(this);
+		showFPS=false;
 	}
 
 	@Override
@@ -175,7 +180,7 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	private synchronized void createLevel() {
 		try {
-			level = Level.fromFile("/levels/level1.bmp");
+			level = Level.fromFile("/res/levels/level1.bmp");
 		} catch (Exception ex) {
 			throw new RuntimeException("Unable to load level", ex);
 		}
@@ -213,9 +218,6 @@ public class MojamComponent extends Canvas implements Runnable,
 			return;
 		}
 
-		// if (!isMultiplayer) {
-		// createLevel();
-		// }
 
 		int toTick = 0;
 
@@ -316,8 +318,9 @@ public class MojamComponent extends Canvas implements Runnable,
 		if (!menuStack.isEmpty()) {
 			menuStack.peek().render(screen);
 		}
-
-		Font.draw(screen, "FPS: " + fps, 10, 10);
+		if(showFPS){
+			Font.draw(screen, "FPS: " + fps, 10, 10);
+		}
 		// for (int p = 0; p < players.length; p++) {
 		// if (players[p] != null) {
 		// String msg = "P" + (p + 1) + ": " + players[p].getScore();
@@ -361,11 +364,12 @@ public class MojamComponent extends Canvas implements Runnable,
 				level = null;
 				return;
 			}
+			
 		}
 		if (packetLink != null) {
 			packetLink.tick();
 		}
-		if (level != null) {
+		if (level != null && !paused) {
 			if (synchronizer.preTurn()) {
 				synchronizer.postTurn();
 				for (int index = 0; index < keys.getAll().size(); index++) {
@@ -381,6 +385,11 @@ public class MojamComponent extends Canvas implements Runnable,
 					skeys.tick();
 				}
 				level.tick();
+				if (synchedKeys[0].pause.wasPressed()|synchedKeys[1].pause.wasPressed()){
+					addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT));
+					paused = true; 
+					keys.tick();
+				}
 			}
 		}
 		mouseButtons.setPosition(getMousePosition());
@@ -549,7 +558,19 @@ public class MojamComponent extends Canvas implements Runnable,
 			}
 		} else if (button.getId() == TitleMenu.EXIT_GAME_ID) {
 			System.exit(0);
+		} else if (button.getId() == PauseMenu.RETURN_ID){
+			paused=false;
+			keys.tick();
+			popMenu();
+		} else if (button.getId() == PauseMenu.END_GAME_ID){
+			
+		} else if (button.getId() == PauseMenu.FPS_ID){
+			CheckBox box = (CheckBox) button;
+			showFPS = box.isChecked();
+			
+			
 		}
+		
 	}
 
 	private void clearMenus() {

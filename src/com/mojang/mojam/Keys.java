@@ -43,6 +43,7 @@ public class Keys {
 	public Key fireright = new Key();
 	public Key build = new Key();
 	public Key use = new Key();
+	public Key pause = new Key();
 
 	public void tick() {
 		for (Key key : all)

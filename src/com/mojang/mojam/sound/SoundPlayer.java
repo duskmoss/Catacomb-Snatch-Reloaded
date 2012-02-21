@@ -62,7 +62,7 @@ public class SoundPlayer {
 	}
 
 	public void startBackgroundMusic() {
-		String backgroundTrack = "/sound/Background "
+		String backgroundTrack = "/res/sound/Background "
 				+ (TurnSynchronizer.synchedRandom.nextInt(4) + 1) + ".ogg";
 		if (!isMuted() && hasOggPlaybackSupport()
 				&& !isPlaying(BACKGROUND_TRACK)) {

@@ -101,7 +101,7 @@ public class Player extends Mob implements LootCollector {
 		if (keys.up.isDown || keys.down.isDown || keys.left.isDown
 				|| keys.right.isDown) {
 			if ((carrying == null && steps % 10 == 0) || (steps % 20 == 0)) {
-				MojamComponent.soundPlayer.playSound("/sound/Step "
+				MojamComponent.soundPlayer.playSound("/res/sound/Step "
 						+ (TurnSynchronizer.synchedRandom.nextInt(2) + 1)
 						+ ".wav", (float) pos.x, (float) pos.y, true);
 			}
@@ -232,7 +232,7 @@ public class Player extends Mob implements LootCollector {
 				muzzleX = bullet.pos.x + 7 * xa - 8;
 				muzzleY = bullet.pos.y + 5 * ya - 8 + 1;
 				shootDelay = 5;
-				MojamComponent.soundPlayer.playSound("/sound/Shot 1.wav",
+				MojamComponent.soundPlayer.playSound("/res/sound/Shot 1.wav",
 						(float) pos.x, (float) pos.y);
 			}
 		} else {
@@ -275,7 +275,7 @@ public class Player extends Mob implements LootCollector {
 						}
 					}
 					MojamComponent.soundPlayer.playSound(
-							"/sound/Track Place.wav", (float) pos.x,
+							"/res/sound/Track Place.wav", (float) pos.x,
 							(float) pos.y);
 				}
 			}
@@ -540,6 +540,6 @@ public class Player extends Mob implements LootCollector {
 
 	@Override
 	public String getDeatchSound() {
-		return "/sound/Death.wav";
+		return "/res/sound/Death.wav";
 	}
 }

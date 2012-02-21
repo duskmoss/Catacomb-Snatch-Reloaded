@@ -24,7 +24,7 @@ public class Bomb extends Building {
 	@Override
 	public void die() {
 		level.addEntity(new LargeBombExplodeAnimation(pos.x, pos.y));
-		MojamComponent.soundPlayer.playSound("/sound/Explosion 2.wav",
+		MojamComponent.soundPlayer.playSound("/res/sound/Explosion 2.wav",
 				(float) pos.x, (float) pos.y);
 
 		Set<Entity> entities = level.getEntities(pos.x - BOMB_DISTANCE, pos.y

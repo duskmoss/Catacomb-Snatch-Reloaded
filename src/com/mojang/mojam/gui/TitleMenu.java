@@ -15,7 +15,7 @@ public class TitleMenu extends GuiMenu {
 	public static final int CANCEL_JOIN_ID = 1004;
 	public static final int PERFORM_JOIN_ID = 1005;
 	public static final int RESTART_GAME_ID = 1006;
-
+	
 	// public static lol... ;)
 	public static String ip = "";
 
@@ -30,6 +30,8 @@ public class TitleMenu extends GuiMenu {
 		addButton(new Button(HOST_GAME_ID, 2, (gameWidth - 128) / 2, 240));
 		addButton(new Button(JOIN_GAME_ID, 3, (gameWidth - 128) / 2, 280));
 		addButton(new Button(EXIT_GAME_ID, 1, (gameWidth - 128) / 2, 320));
+		LAST_ITEM=3;
+		FIRST_ITEM=0;
 	}
 
 	@Override
@@ -53,13 +55,13 @@ public class TitleMenu extends GuiMenu {
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
 			selectedItem--;
-			if (selectedItem < 0) {
-				selectedItem = 3;
+			if (selectedItem < FIRST_ITEM) {
+				selectedItem = LAST_ITEM;
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			selectedItem++;
-			if (selectedItem > 3) {
-				selectedItem = 0;
+			if (selectedItem > LAST_ITEM) {
+				selectedItem = FIRST_ITEM;
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			e.consume();

@@ -123,7 +123,7 @@ public abstract class Mob extends Entity {
 	}
 
 	public String getDeatchSound() {
-		return "/sound/Explosion.wav";
+		return "/res/sound/Explosion.wav";
 	}
 
 	@Override

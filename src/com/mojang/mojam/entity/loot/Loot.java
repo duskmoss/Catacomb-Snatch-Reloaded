@@ -147,16 +147,16 @@ public class Loot extends Entity {
 		taker.take(this);
 
 		if (value > 8) {
-			MojamComponent.soundPlayer.playSound("/sound/Big Gem.wav",
+			MojamComponent.soundPlayer.playSound("/res/sound/Big Gem.wav",
 					(float) pos.x, (float) pos.y);
 		} else if (value > 6) {
-			MojamComponent.soundPlayer.playSound("/sound/Gem.wav",
+			MojamComponent.soundPlayer.playSound("/res/sound/Gem.wav",
 					(float) pos.x, (float) pos.y);
 		} else if (value > 4) {
-			MojamComponent.soundPlayer.playSound("/sound/Big Coin.wav",
+			MojamComponent.soundPlayer.playSound("/res/sound/Big Coin.wav",
 					(float) pos.x, (float) pos.y);
 		} else {
-			MojamComponent.soundPlayer.playSound("/sound/Small Coin.wav",
+			MojamComponent.soundPlayer.playSound("/res/sound/Small Coin.wav",
 					(float) pos.x, (float) pos.y);
 		}
 	}

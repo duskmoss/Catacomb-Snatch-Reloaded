@@ -76,6 +76,6 @@ public class Snake extends Mob {
 
 	@Override
 	public String getDeatchSound() {
-		return "/sound/Enemy Death 2.wav";
+		return "/res/sound/Enemy Death 2.wav";
 	}
 }

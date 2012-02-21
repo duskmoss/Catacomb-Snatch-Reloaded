@@ -67,7 +67,7 @@ public class Bullet extends Entity {
 			hit = true;
 		}
 		if (hit) {
-			MojamComponent.soundPlayer.playSound("/sound/Shot 2.wav",
+			MojamComponent.soundPlayer.playSound("/res/sound/Shot 2.wav",
 					(float) pos.x, (float) pos.y);
 		}
 	}
