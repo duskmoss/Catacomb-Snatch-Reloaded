@@ -44,6 +44,7 @@ public class Keys {
 	public Key build = new Key();
 	public Key use = new Key();
 	public Key pause = new Key();
+	public Key chat = new Key();
 
 	public void tick() {
 		for (Key key : all)

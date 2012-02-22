@@ -22,7 +22,8 @@ public class Art {
 			32);
 	public static Bitmap[] titles = cut("/res/titles.png", 128);
 	public static Bitmap[][] buttons = cut("/res/buttons/buttons.png", 128, 24);
-	//public static Bitmap[] checkbox = cut("/res/buttons/checkbox.png", 64);
+	public static Bitmap checked = load("/res/buttons/checked.png");
+	public static Bitmap unchecked = load("/res/buttons/unchecked.png");
 	public static Bitmap[][] font = cut("/res/gamfont.png", 8, 8);
 	public static Bitmap[][] mapIcons = cut("/res/mapicons.png", 5, 5);
 	public static Bitmap titleScreen = load("/res/screen/TITLESCREEN.png");

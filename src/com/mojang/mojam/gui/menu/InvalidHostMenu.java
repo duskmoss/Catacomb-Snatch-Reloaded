@@ -1,7 +1,9 @@
-package com.mojang.mojam.gui;
+package com.mojang.mojam.gui.menu;
 
 import java.awt.event.KeyEvent;
 
+import com.mojang.mojam.gui.MenuButton;
+import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Screen;
 
 public class InvalidHostMenu extends GuiMenu {
@@ -11,9 +13,9 @@ public class InvalidHostMenu extends GuiMenu {
 	private int textHeight;
 
 	public InvalidHostMenu() {
-		super(100);
-		textHeight=getNextHeight();
-		addButton(new Button(TitleMenu.BACK_ID, 4, 250, getNextHeight()));
+		super();
+		textHeight=100;
+		addButton(new MenuButton(TitleMenu.BACK_ID, 4, 250, 140));
 	}
 	
 	@Override

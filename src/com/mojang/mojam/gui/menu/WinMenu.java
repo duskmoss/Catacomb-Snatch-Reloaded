@@ -1,25 +1,31 @@
-package com.mojang.mojam.gui;
+package com.mojang.mojam.gui.menu;
 
-import java.awt.event.KeyEvent;
-
+import com.mojang.mojam.gui.MenuButton;
+import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
-public class WinMenu extends GuiMenu {
-	private int selectedItem = 0;
-	private final int gameWidth;
+public class WinMenu extends ScrollingMenu {
+		
 	private int winningPlayer;
+	private final int gameWidth;
+	
 	private int textHeight;
 	public final int buttonCenter;
 
 	public WinMenu(int gameWidth, int gameHeight, int winningPlayer) {
-		super(160);
-		buttonCenter=((gameWidth-Button.width)/2);
+		super(160, 0, 0);
+		returnItem = 0;
+		
 		this.winningPlayer = winningPlayer;
 		this.gameWidth = gameWidth;
-		textHeight = getNextHeight();
+		
+		
 
-		addButton(new Button(TitleMenu.RESTART_GAME_ID, 6,
+		textHeight = getNextHeight();
+		buttonCenter=((gameWidth-MenuButton.width)/2);
+		
+		addButton(new MenuButton(TitleMenu.RESTART_GAME_ID, 6,
 				buttonCenter, getNextHeight()));
 	}
 
@@ -48,25 +54,8 @@ public class WinMenu extends GuiMenu {
 		if (winningPlayer == 1)
 			screen.blit(Art.herrSpeck[0][6], buttonCenter - 40,
 					190 + selectedItem * 40);
+		
+		screen.blit(Art.lordLard[0][6], buttonCenter - 40,
+				INITIAL-10 + selectedItem * 40);
 	}
-
-	@Override
-	public void buttonPressed(Button button) {
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			buttons.get(selectedItem).postClick();
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-	}
-
 }

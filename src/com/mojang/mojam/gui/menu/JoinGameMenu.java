@@ -1,7 +1,10 @@
-package com.mojang.mojam.gui;
+package com.mojang.mojam.gui.menu;
 
 import java.awt.event.KeyEvent;
 
+import com.mojang.mojam.gui.Button;
+import com.mojang.mojam.gui.MenuButton;
+import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Screen;
 
 public class JoinGameMenu extends GuiMenu {
@@ -10,11 +13,11 @@ public class JoinGameMenu extends GuiMenu {
 	int textHeight;
 
 	public JoinGameMenu() {
-		super(100);
-		textHeight=getNextHeight();
-		joinButton = addButton(new Button(TitleMenu.PERFORM_JOIN_ID, 3, 100,
-				getNextHeight()));
-		addButton(new Button(TitleMenu.CANCEL_JOIN_ID, 4, 250, getSameHeight()));
+		super();
+		textHeight=100;
+		joinButton = addButton(new MenuButton(TitleMenu.PERFORM_JOIN_ID, 3, 100,
+				140));
+		addButton(new MenuButton(TitleMenu.CANCEL_JOIN_ID, 4, 250, 140));
 	}
 
 	@Override

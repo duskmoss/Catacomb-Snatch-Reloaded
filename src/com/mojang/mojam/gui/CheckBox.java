@@ -1,48 +1,40 @@
 package com.mojang.mojam.gui;
 
-import com.mojang.mojam.MouseButtons;
+import com.mojang.mojam.screen.Art;
+import com.mojang.mojam.screen.Screen;
 
 public class CheckBox extends Button {
 	
 	private boolean isChecked;
-	public final static int width=24;
-	public final static int heigth=24;
+	public final static int width=40;
+	public final static int heigth=40;
+	public final String text;
 
-	public CheckBox(int id, int x, int y) {
-		super(id, x, y);
-		isChecked=false;
+	public CheckBox(int id, String text, int x, int y) {
+		this(id, text, x, y, false);
 	}
 	
-	public CheckBox(int id, int x, int y, boolean initial){
-		super(id, x, y);
+	public CheckBox(int id, String text, int x, int y, boolean initial){
+		super(id, x-8, y-10, width, heigth);
 		isChecked=initial;
+		this.text=text;
+	}
+		
+	@Override
+	public void render(Screen screen) {
+
+		if (isChecked) {
+			screen.blit(Art.checked, x, y);
+		} else {
+			screen.blit(Art.unchecked, x, y);
+		}
+		Font.draw(screen, text, x+width, y+15);
 	}
 	
 	@Override
-	public void tick(MouseButtons mouseButtons) {
-		super.tick(mouseButtons);
-
-		int mx = mouseButtons.getX() / 2;
-		int my = mouseButtons.getY() / 2;
-		if (mx >= x && my >= y && mx < (x + width) && my < (y + heigth)) {
-			if (mouseButtons.isRelased(1)) {
-				postClick();
-			} 
-		}
-		
-		if (performClick) {
-            if (listeners != null) {
-                for (ButtonListener listener : listeners) {
-                    listener.buttonPressed(this);
-                }
-            }
-            performClick = false;
-        }
-    }
-
     public void postClick() {
     	isChecked=!isChecked;
-        performClick = true;
+    	super.postClick();
     }
 	
 	public boolean isChecked(){

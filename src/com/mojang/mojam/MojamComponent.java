@@ -30,15 +30,16 @@ import com.mojang.mojam.entity.building.Base;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.ButtonListener;
+import com.mojang.mojam.gui.ChatOverlay;
 import com.mojang.mojam.gui.CheckBox;
 import com.mojang.mojam.gui.Font;
-import com.mojang.mojam.gui.GuiMenu;
-import com.mojang.mojam.gui.HostingWaitMenu;
-import com.mojang.mojam.gui.InvalidHostMenu;
-import com.mojang.mojam.gui.JoinGameMenu;
-import com.mojang.mojam.gui.PauseMenu;
-import com.mojang.mojam.gui.TitleMenu;
-import com.mojang.mojam.gui.WinMenu;
+import com.mojang.mojam.gui.menu.GuiMenu;
+import com.mojang.mojam.gui.menu.HostingWaitMenu;
+import com.mojang.mojam.gui.menu.InvalidHostMenu;
+import com.mojang.mojam.gui.menu.JoinGameMenu;
+import com.mojang.mojam.gui.menu.PauseMenu;
+import com.mojang.mojam.gui.menu.TitleMenu;
+import com.mojang.mojam.gui.menu.WinMenu;
 import com.mojang.mojam.level.Level;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.network.ClientSidePacketLink;
@@ -51,6 +52,7 @@ import com.mojang.mojam.network.PacketLink;
 import com.mojang.mojam.network.PacketListener;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.network.packet.ChangeKeyCommand;
+import com.mojang.mojam.network.packet.ChatCommand;
 import com.mojang.mojam.network.packet.PauseCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;
@@ -93,6 +95,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	private int createServerState = 0;
 	private boolean showFPS;
 	private boolean paused;
+	private boolean chatting;
+	private String lastmsg="";
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -109,6 +113,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		addMenu(menu);
 		addKeyListener(this);
 		showFPS=false;
+		chatting=false;
 	}
 
 	@Override
@@ -341,6 +346,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
 			Font.draw(screen, "" + player.money, 340, screen.h - 33);
 		}
+		Font.draw(screen, lastmsg,0, 240);
 
 		g.setColor(Color.BLACK);
 
@@ -379,7 +385,9 @@ public class MojamComponent extends Canvas implements Runnable,
 									nextState));
 						}
 					}
-					keys.tick();
+					if(!chatting){
+						keys.tick();
+					}
 					for (Keys skeys : synchedKeys) {
 						skeys.tick();
 					}
@@ -388,11 +396,14 @@ public class MojamComponent extends Canvas implements Runnable,
 						keys.tick();
 						synchronizer.addCommand(new PauseCommand(true));
 					}
-					if (level != null) {
-						if (player.getScore() >= Level.TARGET_SCORE) {
-							synchronizer.addCommand(new EndGameCommand(localId));
-						}	
+					if (keys.chat.wasPressed()){
+						addMenu(new ChatOverlay(localId));
+						chatting = true;
+						keys.tick();
 					}
+					if (player.getScore() >= Level.TARGET_SCORE) {
+						synchronizer.addCommand(new EndGameCommand(localId));
+					}	
 				}
 			}
 		}
@@ -434,6 +445,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		}
 	}
 
+
 	public static void main(String[] args) {
 		MojamComponent mc = new MojamComponent();
 		JFrame frame = new JFrame();
@@ -460,14 +472,18 @@ public class MojamComponent extends Canvas implements Runnable,
 			PauseCommand pc = (PauseCommand) packet;
 			paused = pc.isPause();
 			if(paused){
-				addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, playerId));
+				addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, showFPS, playerId));
 			}else {
 				popMenu();
 			}
 		}if (packet instanceof EndGameCommand){
 			EndGameCommand egc = (EndGameCommand) packet;
 			addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, egc.getWinner()));
+		}if (packet instanceof ChatCommand){
+			ChatCommand cc = (ChatCommand) packet;
+			lastmsg = cc.getMessage();
 		}
+			
 	}
 
 	@Override
@@ -484,13 +500,13 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	@Override
 	public void buttonPressed(Button button) {
-		if (button.getId() == TitleMenu.RESTART_GAME_ID) {
+		if (button.getId() == GuiMenu.RESTART_GAME_ID) {
 			level = null;
 			clearMenus();
 			TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
 			addMenu(menu);
 
-		} else if (button.getId() == TitleMenu.START_GAME_ID) {
+		} else if (button.getId() == GuiMenu.START_GAME_ID) {
 			clearMenus();
 			isMultiplayer = false;
 
@@ -499,7 +515,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			synchronizer.setStarted(true);
 
 			createLevel();
-		} else if (button.getId() == TitleMenu.HOST_GAME_ID) {
+		} else if (button.getId() == GuiMenu.HOST_GAME_ID) {
 			addMenu(new HostingWaitMenu());
 			isMultiplayer = true;
 			isServer = true;
@@ -549,15 +565,15 @@ public class MojamComponent extends Canvas implements Runnable,
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (button.getId() == TitleMenu.JOIN_GAME_ID) {
+		} else if (button.getId() == GuiMenu.JOIN_GAME_ID) {
 			addMenu(new JoinGameMenu());
-		} else if (button.getId() == TitleMenu.CANCEL_JOIN_ID) {
+		} else if (button.getId() == GuiMenu.CANCEL_JOIN_ID) {
 			popMenu();
 			if (hostThread != null) {
 				hostThread.interrupt();
 				hostThread = null;
 			}
-		} else if (button.getId() == TitleMenu.PERFORM_JOIN_ID) {
+		} else if (button.getId() == GuiMenu.PERFORM_JOIN_ID) {
 			try {
 				localId = 1;
 				packetLink = new ClientSidePacketLink(TitleMenu.ip, 3000);
@@ -570,22 +586,24 @@ public class MojamComponent extends Canvas implements Runnable,
 			} catch (Exception e) {
 				addMenu(new InvalidHostMenu());
 			}
-		} else if (button.getId() == TitleMenu.EXIT_GAME_ID) {
+		} else if (button.getId() == GuiMenu.EXIT_GAME_ID) {
 			System.exit(0);
-		} else if (button.getId() == TitleMenu.RETURN_ID){
+		} else if (button.getId() == GuiMenu.RETURN_ID){
 			synchronizer.addCommand(new PauseCommand(false));
 			keys.tick();
-		} else if (button.getId() == TitleMenu.END_GAME_ID){
+		} else if (button.getId() == GuiMenu.END_GAME_ID){
 			popMenu();
 			synchronizer.addCommand(new EndGameCommand(1-localId));
 			
-		} else if (button.getId() == TitleMenu.FPS_ID){
+		} else if (button.getId() == GuiMenu.FPS_ID){
 			CheckBox box = (CheckBox) button;
 			showFPS = box.isChecked();
 						
-		}else if (button.getId() == TitleMenu.BACK_ID){
-			popMenu();
-					
+		}else if (button.getId() == GuiMenu.BACK_ID){
+			popMenu();			
+		}else if (button.getId() == GuiMenu.SEND_ID){
+			popMenu();	
+			
 		}
 		
 	}

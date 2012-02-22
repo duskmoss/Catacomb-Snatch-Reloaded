@@ -4,85 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.mojam.MouseButtons;
-import com.mojang.mojam.screen.Art;
-import com.mojang.mojam.screen.Screen;
 
 public class Button extends GuiComponent {
-
+	
 	protected List<ButtonListener> listeners;
-
 	protected boolean isPressed;
-
-	protected final int x;
-	protected final int y;
-	public final static int width=128;
-	public final static int heigth=24;
-
+	
+	public int x,y,w,h;
+	
 	protected final int id;
+	protected boolean performClick=false;
+	private final boolean clickable;
 	
-	protected boolean performClick = false;
-	
-	
-
-	private int ix;
-
-	private int iy;
-	
-
-	public Button(int id, int x, int y){
+	public Button(int id){
 		this.id = id;
-		this.x = x;
-		this.y = y;
+		clickable = false;
 	}
 	
-	public Button(int id, int buttonImageIndex, int x, int y) {
-		this(id, x, y);
-		this.ix = buttonImageIndex % 2;
-		this.iy = buttonImageIndex / 2;
-	}
 	
-
-	@Override
-	public void tick(MouseButtons mouseButtons) {
-		super.tick(mouseButtons);
-
-		int mx = mouseButtons.getX() / 2;
-		int my = mouseButtons.getY() / 2;
-		isPressed = false;
-		if (mx >= x && my >= y && mx < (x + width) && my < (y + heigth)) {
-			if (mouseButtons.isRelased(1)) {
-				postClick();
-			} else if (mouseButtons.isDown(1)) {
-				isPressed = true;
-			}
-		}
-		if (performClick) {
-            if (listeners != null) {
-                for (ButtonListener listener : listeners) {
-                    listener.buttonPressed(this);
-                }
-            }
-            performClick = false;
-        }
-    }
-
-    public void postClick() {
-        performClick = true;
-    }
-
-	@Override
-	public void render(Screen screen) {
-
-		if (isPressed) {
-			screen.blit(Art.buttons[ix][iy * 2 + 1], x, y);
-		} else {
-			screen.blit(Art.buttons[ix][iy * 2 + 0], x, y);
-		}
+	public Button(int id, int x, int y, int width, int heigth) {
+		this.id = id;
+		this.x=x;
+		this.y=y;
+		this.w=width;
+		this.h=heigth;
+		clickable=true;
 	}
 
-	public boolean isPressed() {
-		return isPressed;
-	}
 
 	public void addListener(ButtonListener listener) {
 		if (listeners == null) {
@@ -90,8 +38,40 @@ public class Button extends GuiComponent {
 		}
 		listeners.add(listener);
 	}
-
+	
+	@Override
+	public void tick(MouseButtons mouseButtons) {
+		super.tick(mouseButtons);
+		if(clickable){
+			checkClick(mouseButtons);
+		}
+    }
+	
+	
+	private void checkClick(MouseButtons mouseButtons){
+		int mx = mouseButtons.getX() / 2;
+		int my = mouseButtons.getY() / 2;
+		isPressed = false;
+		if (mx >= x && my >= y && mx < (x + w) && my < (y + h)) {
+			if (mouseButtons.isRelased(1)) {
+				postClick();
+			} else if (mouseButtons.isDown(1)) {
+				isPressed = true;
+			}
+		}
+	}
+    public void postClick() {
+    	if (listeners != null) {
+			for (ButtonListener listener : listeners) {
+				listener.buttonPressed(this);
+			}
+		}
+    }
+	public boolean isPressed() {
+		return isPressed;
+	}
 	public int getId() {
 		return id;
 	}
+
 }

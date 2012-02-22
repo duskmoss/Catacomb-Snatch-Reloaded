@@ -27,6 +27,9 @@ public class InputHandler implements KeyListener {
 		mappings.put(KeyEvent.VK_E, keys.use);
 		
 		mappings.put(KeyEvent.VK_ESCAPE, keys.pause);
+		
+		mappings.put(KeyEvent.VK_ENTER, keys.chat);
+		mappings.put(KeyEvent.VK_T, keys.chat);
 	}
 
 	public void keyPressed(KeyEvent ke) {
