@@ -518,10 +518,6 @@ public class MojamComponent extends Canvas implements Runnable,
 	public void buttonPressed(Button button) {
 		if (button.getId() == GuiMenu.RESTART_GAME_ID) {
 			level = null;
-			synchronizer=null;
-			if(isMultiplayer){
-				packetLink=null;
-			}
 			clearMenus();
 			TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
 			addMenu(menu);
