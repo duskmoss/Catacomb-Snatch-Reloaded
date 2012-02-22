@@ -10,6 +10,10 @@ public class ChatCommand extends NetworkCommand {
 
 	byte[] message;
 	
+	public ChatCommand(){
+		message="".getBytes();
+	}
+	
 	public ChatCommand(String msg) {
 		message=msg.getBytes();
 		
@@ -17,12 +21,14 @@ public class ChatCommand extends NetworkCommand {
 
 	@Override
 	public void read(DataInputStream dis) throws IOException {
-		dis.read(message);
+		message = new byte[dis.readInt()];		
+		dis.readFully(message);
 
 	}
 
 	@Override
 	public void write(DataOutputStream dos) throws IOException {
+		dos.writeInt(message.length);
 		dos.write(message);
 
 	}

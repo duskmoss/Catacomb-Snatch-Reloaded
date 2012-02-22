@@ -5,6 +5,7 @@ import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.entity.mob.Mummy;
 import com.mojang.mojam.entity.mob.Snake;
 import com.mojang.mojam.entity.mob.Team;
+import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
@@ -45,6 +46,8 @@ public class SpawnerEntity extends Building {
 				* 5;
 		double y = pos.y + (TurnSynchronizer.synchedRandom.nextFloat() - 0.5)
 				* 5;
+		x=Math.max(Math.min(x, level.width*Tile.WIDTH), 0);//spawn only inside the level!
+		y=Math.max(Math.min(y, level.height*Tile.HEIGHT), 0);
 		// Mob te = new Mummy(x, y);
 
 		Mob te = null;
