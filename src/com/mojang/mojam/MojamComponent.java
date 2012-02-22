@@ -30,13 +30,15 @@ import com.mojang.mojam.entity.building.Base;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.ButtonListener;
-import com.mojang.mojam.gui.ChatOverlay;
+import com.mojang.mojam.gui.ChatStack;
 import com.mojang.mojam.gui.CheckBox;
 import com.mojang.mojam.gui.Font;
+import com.mojang.mojam.gui.menu.ChatOverlay;
 import com.mojang.mojam.gui.menu.GuiMenu;
 import com.mojang.mojam.gui.menu.HostingWaitMenu;
 import com.mojang.mojam.gui.menu.InvalidHostMenu;
 import com.mojang.mojam.gui.menu.JoinGameMenu;
+import com.mojang.mojam.gui.menu.Overlay;
 import com.mojang.mojam.gui.menu.PauseMenu;
 import com.mojang.mojam.gui.menu.TitleMenu;
 import com.mojang.mojam.gui.menu.WinMenu;
@@ -96,7 +98,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	private boolean showFPS;
 	private boolean paused;
 	private boolean chatting;
-	private String lastmsg="";
+	
+	private ChatStack chats = new ChatStack();
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -314,6 +317,7 @@ public class MojamComponent extends Canvas implements Runnable,
 				lastTimer1 += 1000;
 				fps = frames;
 				frames = 0;
+				chats.trim();
 			}
 		}
 	}
@@ -342,11 +346,20 @@ public class MojamComponent extends Canvas implements Runnable,
 		// Font.draw(screen, msg, 320, screen.h - 24 + p * 8);
 		// }
 		// }
-		if (player != null && (topMenu == null || (topMenu instanceof PauseMenu))) {
+		if (player != null && (topMenu == null || (topMenu instanceof Overlay))) {
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
 			Font.draw(screen, "" + player.money, 340, screen.h - 33);
+			if(chats.size()>0){
+				ChatStack temp = (ChatStack) chats.clone();
+				int ypos=300;
+				while(!temp.isEmpty()){
+					Font.draw(screen, temp.pop(), 0, ypos);
+					ypos -= 10;
+				}
+				
+			}
 		}
-		Font.draw(screen, lastmsg,0, 240);
+		
 
 		g.setColor(Color.BLACK);
 
@@ -381,24 +394,27 @@ public class MojamComponent extends Canvas implements Runnable,
 						Keys.Key key = keys.getAll().get(index);
 						boolean nextState = key.nextState;
 						if (key.isDown != nextState) {
-							synchronizer.addCommand(new ChangeKeyCommand(index,
-									nextState));
+							if(!chatting){
+								synchronizer.addCommand(new ChangeKeyCommand(index,
+										nextState));
+							}
 						}
 					}
-					if(!chatting){
-						keys.tick();
-					}
+					
+					keys.tick();
 					for (Keys skeys : synchedKeys) {
 						skeys.tick();
 					}
+					
 					level.tick();
 					if (keys.pause.wasPressed()) {
 						keys.tick();
 						synchronizer.addCommand(new PauseCommand(true));
 					}
-					if (keys.chat.wasPressed()){
+					if (!chatting && keys.chat.wasPressed()){
 						addMenu(new ChatOverlay(localId));
 						chatting = true;
+						keys.release();
 						keys.tick();
 					}
 					if (player.getScore() >= Level.TARGET_SCORE) {
@@ -481,7 +497,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, egc.getWinner()));
 		}if (packet instanceof ChatCommand){
 			ChatCommand cc = (ChatCommand) packet;
-			lastmsg = cc.getMessage();
+			chats.push(cc.getMessage());
 		}
 			
 	}
@@ -602,7 +618,14 @@ public class MojamComponent extends Canvas implements Runnable,
 		}else if (button.getId() == GuiMenu.BACK_ID){
 			popMenu();			
 		}else if (button.getId() == GuiMenu.SEND_ID){
-			popMenu();	
+			ChatOverlay chat = (ChatOverlay) menuStack.peek();
+			chatting = false;
+			popMenu();
+			String message=chat.getMessage();
+			if(message != null){
+				synchronizer.addCommand(new ChatCommand(message));
+			}
+			keys.tick();
 			
 		}
 		

@@ -1,14 +1,15 @@
-package com.mojang.mojam.gui;
+package com.mojang.mojam.gui.menu;
 
 import java.awt.event.KeyEvent;
 
-import com.mojang.mojam.gui.menu.GuiMenu;
-import com.mojang.mojam.gui.menu.TitleMenu;
+import com.mojang.mojam.gui.Button;
+import com.mojang.mojam.gui.Font;
+import com.mojang.mojam.screen.Screen;
 
-public class ChatOverlay extends GuiMenu{
+public class ChatOverlay extends GuiMenu implements Overlay{
 	
-	private String message;
-	private String header;
+	private String message="";
+	private String header="";
 	private Button sendButton;
 	
 	public ChatOverlay(int player){
@@ -17,17 +18,32 @@ public class ChatOverlay extends GuiMenu{
 		}else if(player==1){
 			header="Herr Von Speck:";
 		}
-		sendButton=new Button(GuiMenu.SEND_ID);
+		sendButton=addButton(new Button(GuiMenu.SEND_ID));
 	}
 	
 	public String getMessage(){
-		return header+message;		
+		if(message.length()>0){
+			return header+message;
+		}
+		return null;
+				
+	}
+	
+	public void render(Screen screen) {
+
+		
+		Font.draw(screen, header+message, 0, 320);
+
+		super.render(screen);
 	}
 	
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyChar() == KeyEvent.VK_ENTER && message.length() > 0) {
+		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+			sendButton.postClick();
+		}if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
+			message="";
 			sendButton.postClick();
 		}
 

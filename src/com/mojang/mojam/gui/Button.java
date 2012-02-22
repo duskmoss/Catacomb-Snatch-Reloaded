@@ -45,6 +45,14 @@ public class Button extends GuiComponent {
 		if(clickable){
 			checkClick(mouseButtons);
 		}
+		if(performClick){
+			if (listeners != null) {
+				for (ButtonListener listener : listeners) {
+					listener.buttonPressed(this);
+				}
+			}
+			performClick = false;
+		}
     }
 	
 	
@@ -61,11 +69,7 @@ public class Button extends GuiComponent {
 		}
 	}
     public void postClick() {
-    	if (listeners != null) {
-			for (ButtonListener listener : listeners) {
-				listener.buttonPressed(this);
-			}
-		}
+    	performClick=true;
     }
 	public boolean isPressed() {
 		return isPressed;

@@ -6,7 +6,7 @@ import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
-public class PauseMenu extends ScrollingMenu {
+public class PauseMenu extends ScrollingMenu implements Overlay {
 	
 	private final int gameWidth;
 	private int player;

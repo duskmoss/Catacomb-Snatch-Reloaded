@@ -54,8 +54,5 @@ public class WinMenu extends ScrollingMenu {
 		if (winningPlayer == 1)
 			screen.blit(Art.herrSpeck[0][6], buttonCenter - 40,
 					190 + selectedItem * 40);
-		
-		screen.blit(Art.lordLard[0][6], buttonCenter - 40,
-				INITIAL-10 + selectedItem * 40);
 	}
 }
