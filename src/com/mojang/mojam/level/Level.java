@@ -47,8 +47,7 @@ public class Level {
 	private boolean seen[];
 	final int[] neighbourOffsets;
 
-	public int player1Score = 0;
-	public int player2Score = 0;
+	private List<Player> players = new ArrayList<Player>(2);
 
 	@SuppressWarnings("unchecked")
 	public Level(int width, int height) {
@@ -158,7 +157,7 @@ public class Level {
 			final Tile tile = getTile((int) (x / Tile.WIDTH),
 					(int) (y / Tile.HEIGHT));
 			if (tile instanceof FloorTile) {
-				addEntity(new SpawnerEntity(x, y, Team.Neutral, 0));
+				addEntity(new SpawnerEntity(x, y, 0));
 			}
 		}
 
@@ -365,7 +364,7 @@ public class Level {
 						if (getEntities(
 								new BB(null, x - r, y - r, x + r, y + r),
 								Turret.class).size() == 0) {
-							addEntity(new SpawnerEntity(x, y, Team.Neutral,
+							addEntity(new SpawnerEntity(x, y,
 									random.nextInt(3)));
 						}
 					}
@@ -597,9 +596,9 @@ public class Level {
 		screen.blit(Art.panel, 0, screen.h - 80);
 		screen.blit(minimap, 429, screen.h - 80 + 5);
 
-		Font.draw(screen, "Lord Lard: " + player1Score * 100 / TARGET_SCORE
+		Font.draw(screen, "Lord Lard: " + players.get(0).getScore() * 100 / TARGET_SCORE
 				+ "%", 140, screen.h - 20);
-		Font.draw(screen, "Herr Von Speck: " + player2Score * 100
+		Font.draw(screen, "Herr Von Speck: " + players.get(1).getScore() * 100
 				/ TARGET_SCORE + "%", 56, screen.h - 36);
 
 		Notifications.getInstance().render(screen);
@@ -698,5 +697,16 @@ public class Level {
 		if (player != null) {
 			setTile(x, y, tile);
 		}
+	}
+
+	public void addScore(int player, int score) {
+		players.get(player).addScore(score);
+		
+	}
+
+	public void addPlayer(Player player) {
+		this.players.add(player);
+		addEntity(player);
+		
 	}
 }

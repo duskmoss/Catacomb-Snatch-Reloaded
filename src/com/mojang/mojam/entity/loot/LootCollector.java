@@ -9,7 +9,7 @@ public interface LootCollector {
 
 	public void notifySucking();
 
-	public int getScore();
+	public int getMoney();
 
 	public void flash();
 }

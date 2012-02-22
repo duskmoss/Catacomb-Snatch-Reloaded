@@ -34,6 +34,7 @@ import com.mojang.mojam.gui.CheckBox;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.gui.GuiMenu;
 import com.mojang.mojam.gui.HostingWaitMenu;
+import com.mojang.mojam.gui.InvalidHostMenu;
 import com.mojang.mojam.gui.JoinGameMenu;
 import com.mojang.mojam.gui.PauseMenu;
 import com.mojang.mojam.gui.TitleMenu;
@@ -42,6 +43,7 @@ import com.mojang.mojam.level.Level;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.network.ClientSidePacketLink;
 import com.mojang.mojam.network.CommandListener;
+import com.mojang.mojam.network.EndGameCommand;
 import com.mojang.mojam.network.NetworkCommand;
 import com.mojang.mojam.network.NetworkPacketLink;
 import com.mojang.mojam.network.Packet;
@@ -49,6 +51,7 @@ import com.mojang.mojam.network.PacketLink;
 import com.mojang.mojam.network.PacketListener;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.network.packet.ChangeKeyCommand;
+import com.mojang.mojam.network.packet.PauseCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;
 import com.mojang.mojam.screen.Screen;
@@ -77,7 +80,6 @@ public class MojamComponent extends Canvas implements Runnable,
 	public MouseButtons mouseButtons = new MouseButtons();
 	public Keys keys = new Keys();
 	public Keys[] synchedKeys = { new Keys(), new Keys() };
-	public Player[] players = new Player[2];
 	public Player player;
 	public TurnSynchronizer synchronizer;
 	private PacketLink packetLink;
@@ -179,6 +181,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	private synchronized void createLevel() {
+		Player[] players = new Player[2];
 		try {
 			level = Level.fromFile("/res/levels/level1.bmp");
 		} catch (Exception ex) {
@@ -190,16 +193,19 @@ public class MojamComponent extends Canvas implements Runnable,
 		players[0] = new Player(synchedKeys[0], level.width * Tile.WIDTH / 2
 				- 16, (level.height - 5 - 1) * Tile.HEIGHT - 16, Team.Team1);
 		players[0].setFacing(4);
-		level.addEntity(players[0]);
 		level.addEntity(new Base(34 * Tile.WIDTH, 7 * Tile.WIDTH, Team.Team1));
+		level.addPlayer(players[0]);
 		if (isMultiplayer) {
 			players[1] = new Player(synchedKeys[1], level.width * Tile.WIDTH
 					/ 2 - 16, 7 * Tile.HEIGHT - 16, Team.Team2);
 			// players[1] = new Player(synchedKeys[1], 10, 10);
-			level.addEntity(players[1]);
 			level.addEntity(new Base(32 * Tile.WIDTH - 20,
 					32 * Tile.WIDTH - 20, Team.Team2));
+			
+		}else{		
+			players[1] = new Player(new Keys(),  level.width * Tile.WIDTH	/ 2 - 16, 7 * Tile.HEIGHT - 16, Team.Team2);
 		}
+		level.addPlayer(players[1]);
 		player = players[localId];
 		player.setCanSee(true);
 	}
@@ -315,8 +321,12 @@ public class MojamComponent extends Canvas implements Runnable,
 					(float) player.pos.y);
 			level.render(screen, xScroll, yScroll);
 		}
+		GuiMenu topMenu;
 		if (!menuStack.isEmpty()) {
-			menuStack.peek().render(screen);
+			topMenu = menuStack.peek();
+			topMenu.render(screen);
+		}else{
+			topMenu = null;
 		}
 		if(showFPS){
 			Font.draw(screen, "FPS: " + fps, 10, 10);
@@ -327,9 +337,9 @@ public class MojamComponent extends Canvas implements Runnable,
 		// Font.draw(screen, msg, 320, screen.h - 24 + p * 8);
 		// }
 		// }
-		if (player != null && menuStack.size() == 0) {
+		if (player != null && (topMenu == null || (topMenu instanceof PauseMenu))) {
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
-			Font.draw(screen, "" + player.score, 340, screen.h - 33);
+			Font.draw(screen, "" + player.money, 340, screen.h - 33);
 		}
 
 		g.setColor(Color.BLACK);
@@ -353,42 +363,36 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	private void tick() {
-		if (level != null) {
-			if (level.player1Score >= Level.TARGET_SCORE) {
-				addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, 1));
-				level = null;
-				return;
-			}
-			if (level.player2Score >= Level.TARGET_SCORE) {
-				addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, 2));
-				level = null;
-				return;
-			}
-			
-		}
 		if (packetLink != null) {
 			packetLink.tick();
 		}
-		if (level != null && !paused) {
+		
+		if (level != null) {
 			if (synchronizer.preTurn()) {
 				synchronizer.postTurn();
-				for (int index = 0; index < keys.getAll().size(); index++) {
-					Keys.Key key = keys.getAll().get(index);
-					boolean nextState = key.nextState;
-					if (key.isDown != nextState) {
-						synchronizer.addCommand(new ChangeKeyCommand(index,
-								nextState));
+				if (!paused) {
+					for (int index = 0; index < keys.getAll().size(); index++) {
+						Keys.Key key = keys.getAll().get(index);
+						boolean nextState = key.nextState;
+						if (key.isDown != nextState) {
+							synchronizer.addCommand(new ChangeKeyCommand(index,
+									nextState));
+						}
 					}
-				}
-				keys.tick();
-				for (Keys skeys : synchedKeys) {
-					skeys.tick();
-				}
-				level.tick();
-				if (synchedKeys[0].pause.wasPressed()|synchedKeys[1].pause.wasPressed()){
-					addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT));
-					paused = true; 
 					keys.tick();
+					for (Keys skeys : synchedKeys) {
+						skeys.tick();
+					}
+					level.tick();
+					if (keys.pause.wasPressed()) {
+						keys.tick();
+						synchronizer.addCommand(new PauseCommand(true));
+					}
+					if (level != null) {
+						if (player.getScore() >= Level.TARGET_SCORE) {
+							synchronizer.addCommand(new EndGameCommand(localId));
+						}	
+					}
 				}
 			}
 		}
@@ -452,6 +456,18 @@ public class MojamComponent extends Canvas implements Runnable,
 			synchedKeys[playerId].getAll().get(ckc.getKey()).nextState = ckc
 					.getNextState();
 		}
+		if (packet instanceof PauseCommand){
+			PauseCommand pc = (PauseCommand) packet;
+			paused = pc.isPause();
+			if(paused){
+				addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, playerId));
+			}else {
+				popMenu();
+			}
+		}if (packet instanceof EndGameCommand){
+			EndGameCommand egc = (EndGameCommand) packet;
+			addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, egc.getWinner()));
+		}
 	}
 
 	@Override
@@ -469,6 +485,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	@Override
 	public void buttonPressed(Button button) {
 		if (button.getId() == TitleMenu.RESTART_GAME_ID) {
+			level = null;
 			clearMenus();
 			TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
 			addMenu(menu);
@@ -541,34 +558,34 @@ public class MojamComponent extends Canvas implements Runnable,
 				hostThread = null;
 			}
 		} else if (button.getId() == TitleMenu.PERFORM_JOIN_ID) {
-			menuStack.clear();
-			isMultiplayer = true;
-			isServer = false;
-
 			try {
 				localId = 1;
 				packetLink = new ClientSidePacketLink(TitleMenu.ip, 3000);
 				synchronizer = new TurnSynchronizer(this, packetLink, localId,
 						2);
 				packetLink.setPacketListener(this);
+				isMultiplayer = true;
+				isServer = false;
+				menuStack.clear();
 			} catch (Exception e) {
-				e.printStackTrace();
-				// System.exit(1);
-				addMenu(new TitleMenu(GAME_WIDTH, GAME_HEIGHT));
+				addMenu(new InvalidHostMenu());
 			}
 		} else if (button.getId() == TitleMenu.EXIT_GAME_ID) {
 			System.exit(0);
-		} else if (button.getId() == PauseMenu.RETURN_ID){
-			paused=false;
+		} else if (button.getId() == TitleMenu.RETURN_ID){
+			synchronizer.addCommand(new PauseCommand(false));
 			keys.tick();
+		} else if (button.getId() == TitleMenu.END_GAME_ID){
 			popMenu();
-		} else if (button.getId() == PauseMenu.END_GAME_ID){
+			synchronizer.addCommand(new EndGameCommand(1-localId));
 			
-		} else if (button.getId() == PauseMenu.FPS_ID){
+		} else if (button.getId() == TitleMenu.FPS_ID){
 			CheckBox box = (CheckBox) button;
 			showFPS = box.isChecked();
-			
-			
+						
+		}else if (button.getId() == TitleMenu.BACK_ID){
+			popMenu();
+					
 		}
 		
 	}

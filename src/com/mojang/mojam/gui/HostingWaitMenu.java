@@ -5,18 +5,22 @@ import java.awt.event.KeyEvent;
 import com.mojang.mojam.screen.Screen;
 
 public class HostingWaitMenu extends GuiMenu {
+	
+	
+	int textHeight;
 
 	public HostingWaitMenu() {
-		super();
-
-		addButton(new Button(TitleMenu.CANCEL_JOIN_ID, 4, 250, 180));
+		super(100);
+		textHeight=getNextHeight();
+		getNextHeight();
+		addButton(new Button(TitleMenu.CANCEL_JOIN_ID, 4, 250, getNextHeight()));
 	}
 
 	@Override
 	public void render(Screen screen) {
 
 		screen.clear(0);
-		Font.draw(screen, "Waiting for client to join...", 100, 100);
+		Font.draw(screen, "Waiting for client to join...", 100, textHeight);
 
 		super.render(screen);
 	}

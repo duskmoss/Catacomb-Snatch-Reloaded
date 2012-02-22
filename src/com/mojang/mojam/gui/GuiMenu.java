@@ -13,10 +13,26 @@ public abstract class GuiMenu extends GuiComponent implements ButtonListener,
 	
 	protected int LAST_ITEM;
 	protected int FIRST_ITEM;
+	private int HEIGHT=-1;
+	private int initial;
 	
-	public GuiMenu(){
+	public int getNextHeight() {
+		if(HEIGHT==-1){
+			HEIGHT=initial;
+		}else{
+			HEIGHT += 40;
+		}
+		return HEIGHT;
+	}
+	public int getSameHeight(){
+		return HEIGHT;
+	}
+
+	public GuiMenu(int init){
 		LAST_ITEM = 0 ;
 		FIRST_ITEM = 0;
+		initial = init;
+		
 	}
 	
 	protected List<Button> buttons = new ArrayList<Button>();

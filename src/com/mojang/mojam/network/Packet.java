@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mojang.mojam.network.packet.ChangeKeyCommand;
+import com.mojang.mojam.network.packet.PauseCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;
 
@@ -31,6 +32,8 @@ public abstract class Packet {
 		map(11, TurnPacket.class);
 
 		map(100, ChangeKeyCommand.class);
+		map(101, PauseCommand.class);
+		map(102, EndGameCommand.class);
 	}
 
 	public final int getId() {

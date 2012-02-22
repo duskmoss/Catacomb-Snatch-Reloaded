@@ -5,18 +5,16 @@ import com.mojang.mojam.MouseButtons;
 public class CheckBox extends Button {
 	
 	private boolean isChecked;
+	public final static int width=24;
+	public final static int heigth=24;
 
 	public CheckBox(int id, int x, int y) {
 		super(id, x, y);
-		width = 24;
-		heigth = 24;
 		isChecked=false;
 	}
 	
 	public CheckBox(int id, int x, int y, boolean initial){
 		super(id, x, y);
-		width = 24;
-		heigth = 24;
 		isChecked=initial;
 	}
 	

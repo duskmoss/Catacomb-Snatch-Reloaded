@@ -95,7 +95,7 @@ public class Building extends Mob implements IUsable {
 			return false;
 
 		final int cost = upgradeCosts[upgradeLevel];
-		if (cost > p.getScore())
+		if (cost > p.getMoney())
 			return false;
 
 		++upgradeLevel;

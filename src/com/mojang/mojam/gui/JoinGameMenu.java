@@ -7,21 +7,22 @@ import com.mojang.mojam.screen.Screen;
 public class JoinGameMenu extends GuiMenu {
 
 	private Button joinButton;
+	int textHeight;
 
 	public JoinGameMenu() {
-		super();
-
+		super(100);
+		textHeight=getNextHeight();
 		joinButton = addButton(new Button(TitleMenu.PERFORM_JOIN_ID, 3, 100,
-				180));
-		addButton(new Button(TitleMenu.CANCEL_JOIN_ID, 4, 250, 180));
+				getNextHeight()));
+		addButton(new Button(TitleMenu.CANCEL_JOIN_ID, 4, 250, getSameHeight()));
 	}
 
 	@Override
 	public void render(Screen screen) {
 
 		screen.clear(0);
-		Font.draw(screen, "Enter IP of Host:", 100, 100);
-		Font.draw(screen, TitleMenu.ip + "-", 100, 120);
+		Font.draw(screen, "Enter IP of Host:", 100, textHeight);
+		Font.draw(screen, TitleMenu.ip + "-", 100, textHeight+20);
 
 		super.render(screen);
 	}

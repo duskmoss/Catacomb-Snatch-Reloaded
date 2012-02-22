@@ -5,7 +5,6 @@ import java.util.Set;
 import com.mojang.mojam.entity.Bullet;
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.mob.Mob;
-import com.mojang.mojam.entity.mob.RailDroid;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
@@ -51,9 +50,8 @@ public class Turret extends Building {
 		for (Entity e : entities) {
 			if (!(e instanceof Mob))
 				continue;
-			if ((e instanceof RailDroid))
-				continue;
-			if (!((Mob) e).isNotFriendOf(this))
+			Mob m = (Mob) e;
+			if (!m.isEnemyOf(this))
 				continue;
 			final double dist = e.pos.distSqr(pos);
 			if (dist < radiusSqr && dist < closestDist) {

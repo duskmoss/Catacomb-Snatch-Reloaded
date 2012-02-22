@@ -10,20 +10,21 @@ public class PauseMenu extends GuiMenu {
 	private int selectedItem = 0;
 	private final int gameWidth;
 	private final Button returnButton;
-	
-	
-	
-	public static final int RETURN_ID = 1101;
-	public static final int FPS_ID = 1102;
-	public static final int END_GAME_ID = 1103;
+	private int player;
+	public final int buttonCenter;
+	public int artHeight;
+	public int textHeight;
 
-	public PauseMenu(int gameWidth, int gameHeight) {
-		super();
+	public PauseMenu(int gameWidth, int gameHeight, int player) {
+		super(120);
 		this.gameWidth = gameWidth;
+		this.player = player;
+		textHeight = getNextHeight();
+		buttonCenter=((gameWidth-Button.width)/2);
 
-		returnButton=addButton(new Button(RETURN_ID, 5 , (gameWidth - 128) / 2, 200));
-		addButton(new Button(END_GAME_ID, 6 , (gameWidth - 128) / 2, 240));
-		addButton(new CheckBox(END_GAME_ID, (gameWidth - 128) / 2, 280));
+		returnButton=addButton(new Button(TitleMenu.RETURN_ID, 5 , buttonCenter, getNextHeight()));
+		addButton(new Button(TitleMenu.END_GAME_ID, 6 , buttonCenter, getNextHeight()));
+		addButton(new CheckBox(TitleMenu.FPS_ID, buttonCenter, getNextHeight()));
 		
 		LAST_ITEM = 2;
 		FIRST_ITEM = 0;
@@ -37,9 +38,19 @@ public class PauseMenu extends GuiMenu {
 		 //screen.blit(Art.pauseScreen, 0, 0);
 
 		super.render(screen);
-
-		screen.blit(Art.lordLard[0][6], (gameWidth - 128) / 2 - 40,
-				190 + selectedItem * 40);
+		String msg="";
+		if (player == 0){
+			msg = "by LORD LARD";
+		}
+		if (player == 1){
+			msg = "by HERR VON SPECK";
+		}
+		int textWidth = msg.length()*8;
+		int textCenter = ((gameWidth-textWidth)/2);
+		
+		Font.draw(screen, msg, textCenter, textHeight);
+		screen.blit(Art.lordLard[0][6], buttonCenter - 40,
+				150 + selectedItem * 40);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import com.mojang.mojam.entity.mob.Bat;
 import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.entity.mob.Mummy;
 import com.mojang.mojam.entity.mob.Snake;
+import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
@@ -15,8 +16,8 @@ public class SpawnerEntity extends Building {
 
 	public int type;
 
-	public SpawnerEntity(double x, double y, int team, int type) {
-		super(x, y, team);
+	public SpawnerEntity(double x, double y, int type) {
+		super(x, y, Team.Enemy);
 
 		this.type = type;
 		setStartHealth(20);

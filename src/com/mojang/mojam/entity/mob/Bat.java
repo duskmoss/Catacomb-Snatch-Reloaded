@@ -6,11 +6,11 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
-public class Bat extends Mob {
+public class Bat extends Enemy {
 	private int tick = 0;
 
 	public Bat(double x, double y) {
-		super(x, y, Team.Neutral);
+		super(x, y);
 		setPos(x, y);
 		setStartHealth(1);
 		dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI * 2;
@@ -60,13 +60,6 @@ public class Bat extends Mob {
 
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
-		super.collide(entity, xa, ya);
-
-		if (entity instanceof Mob) {
-			Mob mob = (Mob) entity;
-			if (isNotFriendOf(mob)) {
-				mob.hurt(this, 1);
-			}
-		}
+		super.collide(entity, xa, ya, 1);
 	}
 }

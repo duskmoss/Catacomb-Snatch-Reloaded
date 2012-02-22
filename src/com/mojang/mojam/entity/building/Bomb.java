@@ -39,11 +39,6 @@ public class Bomb extends Building {
 	}
 
 	@Override
-	public boolean isNotFriendOf(Mob m) {
-		return true;
-	}
-
-	@Override
 	public void tick() {
 
 		if (health <= 0) {

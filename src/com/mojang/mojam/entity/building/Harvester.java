@@ -62,7 +62,7 @@ public class Harvester extends Building implements LootCollector {
 				l.forceTake(emptyingPlayer);
 				int toAdd = Math.min(emptyingSpeed, money);
 				money -= toAdd;
-				emptyingPlayer.addScore(toAdd);
+				emptyingPlayer.addMoney(toAdd);
 				level.addEntity(l);
 			}
 		}
@@ -158,7 +158,7 @@ public class Harvester extends Building implements LootCollector {
 	@Override
 	public void take(Loot loot) {
 		loot.remove();
-		money += loot.getScoreValue();
+		money += loot.getValue();
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class Harvester extends Building implements LootCollector {
 	}
 
 	@Override
-	public int getScore() {
+	public int getMoney() {
 		return money;
 	}
 
@@ -184,7 +184,7 @@ public class Harvester extends Building implements LootCollector {
 					money / 2);
 			level.addEntity(loot);
 
-			money -= loot.getScoreValue();
+			money -= loot.getValue();
 		}
 		money = 0;
 	}

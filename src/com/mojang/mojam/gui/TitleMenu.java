@@ -6,6 +6,8 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
 public class TitleMenu extends GuiMenu {
+	
+	
 
 	public static final int START_GAME_ID = 1000;
 	public static final int HOST_GAME_ID = 1002;
@@ -16,20 +18,26 @@ public class TitleMenu extends GuiMenu {
 	public static final int PERFORM_JOIN_ID = 1005;
 	public static final int RESTART_GAME_ID = 1006;
 	
+	public static final int BACK_ID = 1007;
+	
+	public static final int RETURN_ID = 1101;
+	public static final int FPS_ID = 1102;
+	public static final int END_GAME_ID = 1103;
+	
 	// public static lol... ;)
 	public static String ip = "";
 
 	private int selectedItem = 0;
-	private final int gameWidth;
+	public final int buttonCenter;
 
 	public TitleMenu(int gameWidth, int gameHeight) {
-		super();
-		this.gameWidth = gameWidth;
+		super(200);
+		buttonCenter=((gameWidth-Button.width)/2);
 
-		addButton(new Button(START_GAME_ID, 0, (gameWidth - 128) / 2, 200));
-		addButton(new Button(HOST_GAME_ID, 2, (gameWidth - 128) / 2, 240));
-		addButton(new Button(JOIN_GAME_ID, 3, (gameWidth - 128) / 2, 280));
-		addButton(new Button(EXIT_GAME_ID, 1, (gameWidth - 128) / 2, 320));
+		addButton(new Button(START_GAME_ID, 0, buttonCenter, getNextHeight()));
+		addButton(new Button(HOST_GAME_ID, 2, buttonCenter, getNextHeight()));
+		addButton(new Button(JOIN_GAME_ID, 3, buttonCenter, getNextHeight()));
+		addButton(new Button(EXIT_GAME_ID, 1, buttonCenter, getNextHeight()));
 		LAST_ITEM=3;
 		FIRST_ITEM=0;
 	}
@@ -43,7 +51,7 @@ public class TitleMenu extends GuiMenu {
 
 		super.render(screen);
 
-		screen.blit(Art.lordLard[0][6], (gameWidth - 128) / 2 - 40,
+		screen.blit(Art.lordLard[0][6], buttonCenter - 40,
 				190 + selectedItem * 40);
 	}
 

@@ -63,7 +63,7 @@ public class ShopItem extends Building {
 	public void use(Entity user) {
 		if (user instanceof Player && ((Player) user).getTeam() == team) {
 			Player player = (Player) user;
-			if (player.carrying == null && player.getScore() >= COST[type]) {
+			if (player.carrying == null && player.getMoney() >= COST[type]) {
 				player.payCost(COST[type]);
 				Building item = null;
 				switch (type) {

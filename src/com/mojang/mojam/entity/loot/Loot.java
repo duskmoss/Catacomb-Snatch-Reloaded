@@ -186,7 +186,7 @@ public class Loot extends Entity {
 		}
 	}
 
-	public int getScoreValue() {
+	public int getValue() {
 		return fake ? 0 : values[value];
 	}
 }

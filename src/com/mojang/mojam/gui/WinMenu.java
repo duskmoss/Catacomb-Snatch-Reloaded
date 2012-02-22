@@ -9,14 +9,18 @@ public class WinMenu extends GuiMenu {
 	private int selectedItem = 0;
 	private final int gameWidth;
 	private int winningPlayer;
+	private int textHeight;
+	public final int buttonCenter;
 
 	public WinMenu(int gameWidth, int gameHeight, int winningPlayer) {
-		super();
+		super(160);
+		buttonCenter=((gameWidth-Button.width)/2);
 		this.winningPlayer = winningPlayer;
 		this.gameWidth = gameWidth;
+		textHeight = getNextHeight();
 
-		addButton(new Button(TitleMenu.RESTART_GAME_ID, 1,
-				(gameWidth - 128) / 2, 200));
+		addButton(new Button(TitleMenu.RESTART_GAME_ID, 6,
+				buttonCenter, getNextHeight()));
 	}
 
 	@Override
@@ -25,19 +29,24 @@ public class WinMenu extends GuiMenu {
 		screen.blit(Art.gameOverScreen, 0, 0);
 
 		String msg = "";
-		if (winningPlayer == 1)
+		if (winningPlayer == 0){
 			msg = "LORD LARD WINS WOOHOO";
-		if (winningPlayer == 2)
+		}
+		if (winningPlayer == 1){
 			msg = "HERR VON SPECK WINS YAY";
-		Font.draw(screen, msg, 180, 160);
+		}
+		int textWidth = msg.length()*8;
+		int textCenter = ((gameWidth-textWidth)/2);
+		Font.draw(screen, msg, textCenter, textHeight);
+		
 
 		super.render(screen);
 
-		if (winningPlayer == 1)
-			screen.blit(Art.lordLard[0][6], (gameWidth - 128) / 2 - 40,
+		if (winningPlayer == 0)
+			screen.blit(Art.lordLard[0][6], buttonCenter - 40,
 					190 + selectedItem * 40);
-		if (winningPlayer == 2)
-			screen.blit(Art.herrSpeck[0][6], (gameWidth - 128) / 2 - 40,
+		if (winningPlayer == 1)
+			screen.blit(Art.herrSpeck[0][6], buttonCenter - 40,
 					190 + selectedItem * 40);
 	}
 

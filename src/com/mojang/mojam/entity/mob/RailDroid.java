@@ -18,8 +18,8 @@ public class RailDroid extends Mob {
 	public boolean carrying = false;
 	public int swapTime = 0;
 
-	public RailDroid(double x, double y, int team) {
-		super(x, y, team);
+	public RailDroid(double x, double y) {
+		super(x, y, Team.Neutral);
 		this.setSize(10, 8);
 		deathPoints = 1;
 	}
@@ -192,11 +192,11 @@ public class RailDroid extends Mob {
 		if (carrying && swapTime == 0) {
 			if (pos.y < 8 * Tile.HEIGHT) {
 				carrying = false;
-				level.player2Score += 2;
+				level.addScore(1, 2);
 			}
 			if (pos.y > (level.height - 8) * Tile.HEIGHT) {
 				carrying = false;
-				level.player1Score += 2;
+				level.addScore(0, 2);
 			}
 		}
 		// level.getTile(xt, yt)

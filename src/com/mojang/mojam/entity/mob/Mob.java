@@ -63,8 +63,8 @@ public abstract class Mob extends Entity {
 		return team != m.team;
 	}
 
-	public boolean isNotFriendOf(Mob m) {
-		return team != m.team;
+	public boolean isFriendOf(Mob m) {
+		return team == m.team;
 	}
 
 	@Override

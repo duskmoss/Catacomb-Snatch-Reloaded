@@ -11,7 +11,7 @@ public class Mummy extends Mob {
 	public int stepTime;
 
 	public Mummy(double x, double y) {
-		super(x, y, Team.Neutral);
+		super(x, y, Team.Enemy);
 		setPos(x, y);
 		setStartHealth(7);
 		dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI * 2;
@@ -64,14 +64,8 @@ public class Mummy extends Mob {
 
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
-		super.collide(entity, xa, ya);
+		super.collide(entity, xa, 2);
 
-		if (entity instanceof Mob) {
-			Mob mob = (Mob) entity;
-			if (isNotFriendOf(mob)) {
-				mob.hurt(this, 2);
-			}
-		}
 	}
 
 	@Override

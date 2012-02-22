@@ -15,8 +15,8 @@ public class Button extends GuiComponent {
 
 	protected final int x;
 	protected final int y;
-	protected int width;
-	protected int heigth;
+	public final static int width=128;
+	public final static int heigth=24;
 
 	protected final int id;
 	
@@ -37,8 +37,6 @@ public class Button extends GuiComponent {
 	
 	public Button(int id, int buttonImageIndex, int x, int y) {
 		this(id, x, y);
-		this.width = 128;
-		this.heigth = 24;
 		this.ix = buttonImageIndex % 2;
 		this.iy = buttonImageIndex / 2;
 	}

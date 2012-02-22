@@ -2,7 +2,6 @@ package com.mojang.mojam.entity;
 
 import com.mojang.mojam.MojamComponent;
 import com.mojang.mojam.entity.mob.Mob;
-import com.mojang.mojam.entity.mob.RailDroid;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
@@ -41,12 +40,14 @@ public class Bullet extends Entity {
 
 	@Override
 	protected boolean shouldBlock(Entity e) {
-		if (e instanceof Bullet)
+		if (e instanceof Bullet){
 			return false;
-		if ((e instanceof Mob) && !(e instanceof RailDroid)
-				&& !((Mob) e).isNotFriendOf(owner))
-			return false;
-		return e != owner;
+		}
+		if(e instanceof Mob){
+			Mob m = (Mob) e;
+			return !m.isFriendOf(owner);
+		}
+		return true;
 	}
 
 	@Override
@@ -57,8 +58,8 @@ public class Bullet extends Entity {
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
 		if (entity instanceof Mob) {
-			if (((Mob) entity).isNotFriendOf(owner)
-					|| (entity instanceof RailDroid)) {
+			Mob mob = (Mob) entity;
+			if (!mob.isFriendOf(owner)) {
 				entity.hurt(this);
 				hit = true;
 			}

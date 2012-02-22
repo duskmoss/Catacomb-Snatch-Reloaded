@@ -36,7 +36,7 @@ public class Player extends Mob implements LootCollector {
 	public int flashTime = 0;
 	public int suckRadius = 0;
 	public boolean wasShooting;
-	public int score;
+	public int money;
 	private int facing = 0;
 	private int time = 0;
 	private int walkTime = 0;
@@ -56,6 +56,7 @@ public class Player extends Mob implements LootCollector {
 	private int nextWalkSmokeTick = 0;
 
 	private int regenDelay = 0;
+	private int score;
 
 	public Player(Keys keys, int x, int y, int team) {
 		super(x, y, team);
@@ -64,7 +65,7 @@ public class Player extends Mob implements LootCollector {
 		startX = x;
 		startY = y;
 
-		score = 100000;
+		money = 0;
 
 	}
 
@@ -252,7 +253,7 @@ public class Player extends Mob implements LootCollector {
 
 		if (keys.build.isDown && !keys.build.wasDown) {
 			if (level.getTile(x, y).isBuildable()) {
-				if (score >= COST_RAIL && time - lastRailTick >= RailDelayTicks) {
+				if (money >= COST_RAIL && time - lastRailTick >= RailDelayTicks) {
 					lastRailTick = time;
 					level.placeTile(x, y, new RailTile(level.getTile(x, y)),
 							this);
@@ -261,13 +262,13 @@ public class Player extends Mob implements LootCollector {
 			} else if (level.getTile(x, y) instanceof RailTile) {
 				if ((y < 8 && team == Team.Team2)
 						|| (y > level.height - 9 && team == Team.Team1)) {
-					if (score >= COST_DROID) {
-						level.addEntity(new RailDroid(pos.x, pos.y, team));
+					if (money >= COST_DROID) {
+						level.addEntity(new RailDroid(pos.x, pos.y));
 						payCost(COST_DROID);
 					}
 				} else {
 
-					if (score >= COST_REMOVE_RAIL
+					if (money >= COST_REMOVE_RAIL
 							&& time - lastRailTick >= RailDelayTicks) {
 						lastRailTick = time;
 						if (((RailTile) level.getTile(x, y)).remove()) {
@@ -351,7 +352,7 @@ public class Player extends Mob implements LootCollector {
 	}
 
 	public void payCost(int cost) {
-		score -= cost;
+		money -= cost;
 
 		while (cost > 0) {
 			double dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI
@@ -361,28 +362,28 @@ public class Player extends Mob implements LootCollector {
 			loot.makeUntakeable();
 			level.addEntity(loot);
 
-			cost -= loot.getScoreValue();
+			cost -= loot.getValue();
 		}
 	}
 
-	public void addScore(int s) {
+	public void addMoney(int s) {
 		if (s > 0)
-			score += s;
+			money += s;
 	}
 
 	public void dropAllMoney() {
 
-		score /= 2;
-		while (score > 0) {
+		money /= 2;
+		while (money > 0) {
 			double dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI
 					* 2;
 			Loot loot = new Loot(pos.x, pos.y, Math.cos(dir), Math.sin(dir),
-					score / 2);
+					money / 2);
 			level.addEntity(loot);
 
-			score -= loot.getScoreValue();
+			money -= loot.getValue();
 		}
-		score = 0;
+		money = 0;
 	}
 
 	@Override
@@ -433,7 +434,7 @@ public class Player extends Mob implements LootCollector {
 		loot.remove();
 		level.addEntity(new Sparkle(pos.x, pos.y, -1, 0));
 		level.addEntity(new Sparkle(pos.x, pos.y, +1, 0));
-		score += loot.getScoreValue();
+		money += loot.getValue();
 	}
 
 	@Override
@@ -452,8 +453,8 @@ public class Player extends Mob implements LootCollector {
 	}
 
 	@Override
-	public int getScore() {
-		return score;
+	public int getMoney() {
+		return money;
 	}
 
 	@Override
@@ -462,11 +463,11 @@ public class Player extends Mob implements LootCollector {
 	}
 
 	public boolean useMoney(int cost) {
-		if (cost > score) {
+		if (cost > money) {
 			return false;
 		}
 
-		score -= cost;
+		money -= cost;
 		return true;
 	}
 
@@ -541,5 +542,14 @@ public class Player extends Mob implements LootCollector {
 	@Override
 	public String getDeatchSound() {
 		return "/res/sound/Death.wav";
+	}
+
+	public void addScore(int score) {
+		this.score += score;
+		
+	}
+
+	public int getScore() {
+		return score;
 	}
 }
