@@ -38,6 +38,8 @@ public class PauseMenu extends ScrollingMenu {
 
 		super.render(screen);
 		
+		screen.blit(Art.pauseScreen, 0, 0);
+		
 		
 		if (player == 0){
 			msg = "by LORD LARD";
