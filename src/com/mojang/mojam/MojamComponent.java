@@ -85,7 +85,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	public Keys keys = new Keys();
 	public Keys[] synchedKeys = { new Keys(), new Keys() };
 	public Player player;
-	public TurnSynchronizer synchronizer;
+	public static TurnSynchronizer synchronizer;
 	private PacketLink packetLink;
 	private ServerSocket serverSocket;
 	private boolean isMultiplayer;
@@ -99,7 +99,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	private boolean paused;
 	private boolean chatting;
 
-	private ChatStack chats = new ChatStack();
+	private ChatStack chats = new ChatStack(5);
 	private Thread parentThread;
 
 	public MojamComponent() {
@@ -361,15 +361,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		if (player != null && (topMenu == null || (topMenu instanceof Overlay))) {
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
 			Font.draw(screen, "" + player.money, 340, screen.h - 33);
-			if (chats.size() > 0) {
-				ChatStack temp = (ChatStack) chats.clone();
-				int ypos = 300;
-				while (!temp.isEmpty()) {
-					Font.draw(screen, temp.pop(), 0, ypos);
-					ypos -= 10;
-				}
-
-			}
+			chats.render(screen, 0, 300);
 		}
 
 		g.setColor(Color.BLACK);
@@ -428,9 +420,6 @@ public class MojamComponent extends Canvas implements Runnable,
 						chatting = true;
 						keys.release();
 						keys.tick();
-					}
-					if (player.getScore() >= Level.TARGET_SCORE) {
-						synchronizer.addCommand(new EndGameCommand(localId));
 					}
 				}
 			}
@@ -542,7 +531,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			clearMenus();
 			isMultiplayer = false;
 
-			localId = 0;
+			localId = Team.Team1;
 			synchronizer = new TurnSynchronizer(this, null, 0, 1);
 			synchronizer.setStarted(true);
 
@@ -553,7 +542,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			isServer = true;
 			try {
 				if (isServer) {
-					localId = 0;
+					localId = Team.Team1;
 					serverSocket = new ServerSocket(3000);
 					serverSocket.setSoTimeout(1000);
 
@@ -607,7 +596,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			}
 		} else if (button.getId() == GuiMenu.PERFORM_JOIN_ID) {
 			try {
-				localId = 1;
+				localId = Team.Team2;
 				packetLink = new ClientSidePacketLink(TitleMenu.ip, 3000);
 				synchronizer = new TurnSynchronizer(this, packetLink, localId,
 						2);
@@ -639,7 +628,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			popMenu();
 			String message = chat.getMessage();
 			if (message != null) {
-				synchronizer.addCommand(new ChatCommand(message));
+				synchronizer.addCommand(new ChatCommand(message, ChatCommand.CHAT_TYPE));
 			}
 			keys.tick();
 

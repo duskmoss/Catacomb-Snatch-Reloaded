@@ -36,7 +36,7 @@ import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
 public class Level {
-	public static final int TARGET_SCORE = 100;
+	public final int TARGET_SCORE = 100;
 
 	public final int width, height;
 
