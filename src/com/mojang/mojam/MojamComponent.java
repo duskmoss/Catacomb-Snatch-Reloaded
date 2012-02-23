@@ -100,6 +100,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	private boolean chatting;
 	
 	private ChatStack chats = new ChatStack();
+	private Thread parentThread;
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -161,7 +162,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	public void start() {
-		running = true;
+		parentThread = Thread.currentThread();
 		Thread thread = new Thread(this);
 		thread.setPriority(Thread.MAX_PRIORITY);
 		thread.start();
@@ -220,6 +221,13 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	@Override
 	public void run() {
+		while(parentThread.isAlive()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+		running = true;
 		long lastTime = System.nanoTime();
 		double unprocessed = 0;
 		int frames = 0;
@@ -320,6 +328,9 @@ public class MojamComponent extends Canvas implements Runnable,
 				chats.trim();
 			}
 		}
+		JPanel panel = (JPanel) getParent();
+		panel.remove(this);
+		panel.validate();
 	}
 
 	private synchronized void render(Graphics g) {
@@ -382,6 +393,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	private void tick() {
+			
 		if (packetLink != null) {
 			packetLink.tick();
 		}
@@ -517,10 +529,13 @@ public class MojamComponent extends Canvas implements Runnable,
 	@Override
 	public void buttonPressed(Button button) {
 		if (button.getId() == GuiMenu.RESTART_GAME_ID) {
-			level = null;
-			clearMenus();
-			TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
-			addMenu(menu);
+			cleanUp();
+			stop();
+			MojamComponent mc = new MojamComponent();
+			getParent().add(mc);
+			mc.start();
+			
+			
 
 		} else if (button.getId() == GuiMenu.START_GAME_ID) {
 			clearMenus();
@@ -629,6 +644,19 @@ public class MojamComponent extends Canvas implements Runnable,
 			
 		}
 		
+	}
+
+	private void cleanUp() {
+		level = null;
+		player = null;
+		synchronizer=null;
+		emptyCursor = null;
+		if(isMultiplayer){
+			packetLink=null;
+			if(isServer){
+				serverSocket = null;
+			}
+		}
 	}
 
 	private void clearMenus() {
