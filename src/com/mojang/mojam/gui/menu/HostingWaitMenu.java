@@ -7,14 +7,13 @@ import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Screen;
 
 public class HostingWaitMenu extends GuiMenu {
-	
-	
+
 	int textHeight;
 
 	public HostingWaitMenu() {
 		super();
-		textHeight=100;
-		addButton(new MenuButton(TitleMenu.CANCEL_JOIN_ID, 4, 250, 180));
+		textHeight = 100;
+		addButton(new MenuButton(GuiMenu.CANCEL_JOIN_ID, 4, 250, 180));
 	}
 
 	@Override

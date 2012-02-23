@@ -12,7 +12,6 @@ import com.mojang.mojam.screen.Screen;
 
 public class Building extends Mob implements IUsable {
 	public static final int SPAWN_INTERVAL = 60;
-	public static final int MIN_BUILDING_DISTANCE = 1700; // Sqr
 
 	public int spawnTime = 0;
 	public boolean highlight = false;
@@ -99,7 +98,7 @@ public class Building extends Mob implements IUsable {
 			return false;
 
 		++upgradeLevel;
-		p.useMoney(cost);
+		p.payCost(cost);
 		upgradeComplete(upgradeLevel);
 		return true;
 	}

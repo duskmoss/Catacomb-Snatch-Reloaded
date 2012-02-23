@@ -12,7 +12,6 @@ import com.mojang.mojam.screen.Screen;
 public abstract class Mob extends Entity {
 
 	public final static double CARRYSPEEDMOD = 1.2;
-	public final static int MoveControlFlag = 1;
 
 	// private double speed = 0.82;
 	private double speed = 1.0;

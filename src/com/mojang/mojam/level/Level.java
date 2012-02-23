@@ -285,9 +285,9 @@ public class Level {
 
 	public Set<Entity> getEntities(double xx0, double yy0, double xx1,
 			double yy1, Class<? extends Entity> c) {
-		int x0 = (int) ((xx0) / Tile.WIDTH)-1;
+		int x0 = (int) ((xx0) / Tile.WIDTH) - 1;
 		int x1 = (int) ((xx1) / Tile.WIDTH);
-		int y0 = (int) ((yy0) / Tile.HEIGHT)-1;
+		int y0 = (int) ((yy0) / Tile.HEIGHT) - 1;
 		int y1 = (int) ((yy1) / Tile.HEIGHT);
 
 		Set<Entity> result = new TreeSet<Entity>(new EntityComparator());
@@ -364,8 +364,7 @@ public class Level {
 						if (getEntities(
 								new BB(null, x - r, y - r, x + r, y + r),
 								Turret.class).size() == 0) {
-							addEntity(new SpawnerEntity(x, y,
-									random.nextInt(3)));
+							addEntity(new SpawnerEntity(x, y, random.nextInt(3)));
 						}
 					}
 				}
@@ -596,8 +595,8 @@ public class Level {
 		screen.blit(Art.panel, 0, screen.h - 80);
 		screen.blit(minimap, 429, screen.h - 80 + 5);
 
-		Font.draw(screen, "Lord Lard: " + players.get(0).getScore() * 100 / TARGET_SCORE
-				+ "%", 140, screen.h - 20);
+		Font.draw(screen, "Lord Lard: " + players.get(0).getScore() * 100
+				/ TARGET_SCORE + "%", 140, screen.h - 20);
 		Font.draw(screen, "Herr Von Speck: " + players.get(1).getScore() * 100
 				/ TARGET_SCORE + "%", 56, screen.h - 36);
 
@@ -701,12 +700,12 @@ public class Level {
 
 	public void addScore(int player, int score) {
 		players.get(player).addScore(score);
-		
+
 	}
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
 		addEntity(player);
-		
+
 	}
 }

@@ -98,7 +98,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	private boolean showFPS;
 	private boolean paused;
 	private boolean chatting;
-	
+
 	private ChatStack chats = new ChatStack();
 	private Thread parentThread;
 
@@ -116,8 +116,8 @@ public class MojamComponent extends Canvas implements Runnable,
 		TitleMenu menu = new TitleMenu(GAME_WIDTH, GAME_HEIGHT);
 		addMenu(menu);
 		addKeyListener(this);
-		showFPS=false;
-		chatting=false;
+		showFPS = false;
+		chatting = false;
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	private void init() {
 		soundPlayer = new SoundPlayer();
-		soundPlayer.startBackgroundMusic();
+		soundPlayer.playMusic(SoundPlayer.TITLE_ID);
 
 		try {
 			emptyCursor = Toolkit.getDefaultToolkit().createCustomCursor(
@@ -190,6 +190,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	private synchronized void createLevel() {
+		soundPlayer.playMusic(SoundPlayer.BACKGROUND_ID);
 		Player[] players = new Player[2];
 		try {
 			level = Level.fromFile("/res/levels/level1.bmp");
@@ -210,9 +211,10 @@ public class MojamComponent extends Canvas implements Runnable,
 			// players[1] = new Player(synchedKeys[1], 10, 10);
 			level.addEntity(new Base(32 * Tile.WIDTH - 20,
 					32 * Tile.WIDTH - 20, Team.Team2));
-			
-		}else{		
-			players[1] = new Player(new Keys(),  level.width * Tile.WIDTH	/ 2 - 16, 7 * Tile.HEIGHT - 16, Team.Team2);
+
+		} else {
+			players[1] = new Player(new Keys(), level.width * Tile.WIDTH / 2
+					- 16, 7 * Tile.HEIGHT - 16, Team.Team2);
 		}
 		level.addPlayer(players[1]);
 		player = players[localId];
@@ -221,7 +223,7 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	@Override
 	public void run() {
-		while(parentThread.isAlive()){
+		while (parentThread.isAlive()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -239,7 +241,6 @@ public class MojamComponent extends Canvas implements Runnable,
 			e.printStackTrace();
 			return;
 		}
-
 
 		int toTick = 0;
 
@@ -345,10 +346,10 @@ public class MojamComponent extends Canvas implements Runnable,
 		if (!menuStack.isEmpty()) {
 			topMenu = menuStack.peek();
 			topMenu.render(screen);
-		}else{
+		} else {
 			topMenu = null;
 		}
-		if(showFPS){
+		if (showFPS) {
 			Font.draw(screen, "FPS: " + fps, 10, 10);
 		}
 		// for (int p = 0; p < players.length; p++) {
@@ -360,17 +361,16 @@ public class MojamComponent extends Canvas implements Runnable,
 		if (player != null && (topMenu == null || (topMenu instanceof Overlay))) {
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
 			Font.draw(screen, "" + player.money, 340, screen.h - 33);
-			if(chats.size()>0){
+			if (chats.size() > 0) {
 				ChatStack temp = (ChatStack) chats.clone();
-				int ypos=300;
-				while(!temp.isEmpty()){
+				int ypos = 300;
+				while (!temp.isEmpty()) {
 					Font.draw(screen, temp.pop(), 0, ypos);
 					ypos -= 10;
 				}
-				
+
 			}
 		}
-		
 
 		g.setColor(Color.BLACK);
 
@@ -393,11 +393,11 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	private void tick() {
-			
+
 		if (packetLink != null) {
 			packetLink.tick();
 		}
-		
+
 		if (level != null) {
 			if (synchronizer.preTurn()) {
 				synchronizer.postTurn();
@@ -406,24 +406,24 @@ public class MojamComponent extends Canvas implements Runnable,
 						Keys.Key key = keys.getAll().get(index);
 						boolean nextState = key.nextState;
 						if (key.isDown != nextState) {
-							if(!chatting){
-								synchronizer.addCommand(new ChangeKeyCommand(index,
-										nextState));
+							if (!chatting) {
+								synchronizer.addCommand(new ChangeKeyCommand(
+										index, nextState));
 							}
 						}
 					}
-					
+
 					keys.tick();
 					for (Keys skeys : synchedKeys) {
 						skeys.tick();
 					}
-					
+
 					level.tick();
 					if (keys.pause.wasPressed()) {
 						keys.tick();
 						synchronizer.addCommand(new PauseCommand(true));
 					}
-					if (!chatting && keys.chat.wasPressed()){
+					if (!chatting && keys.chat.wasPressed()) {
 						addMenu(new ChatOverlay(localId));
 						chatting = true;
 						keys.release();
@@ -431,7 +431,7 @@ public class MojamComponent extends Canvas implements Runnable,
 					}
 					if (player.getScore() >= Level.TARGET_SCORE) {
 						synchronizer.addCommand(new EndGameCommand(localId));
-					}	
+					}
 				}
 			}
 		}
@@ -473,7 +473,6 @@ public class MojamComponent extends Canvas implements Runnable,
 		}
 	}
 
-
 	public static void main(String[] args) {
 		MojamComponent mc = new MojamComponent();
 		JFrame frame = new JFrame();
@@ -496,22 +495,26 @@ public class MojamComponent extends Canvas implements Runnable,
 			synchedKeys[playerId].getAll().get(ckc.getKey()).nextState = ckc
 					.getNextState();
 		}
-		if (packet instanceof PauseCommand){
+		if (packet instanceof PauseCommand) {
 			PauseCommand pc = (PauseCommand) packet;
 			paused = pc.isPause();
-			if(paused){
-				addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, showFPS, playerId));
-			}else {
+			if (paused) {
+				addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, showFPS,
+						playerId));
+			} else {
 				popMenu();
 			}
-		}if (packet instanceof EndGameCommand){
+		}
+		if (packet instanceof EndGameCommand) {
 			EndGameCommand egc = (EndGameCommand) packet;
 			addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, egc.getWinner()));
-		}if (packet instanceof ChatCommand){
+			soundPlayer.playMusic(SoundPlayer.ENDING_ID);
+		}
+		if (packet instanceof ChatCommand) {
 			ChatCommand cc = (ChatCommand) packet;
 			chats.push(cc.getMessage());
 		}
-			
+
 	}
 
 	@Override
@@ -534,8 +537,6 @@ public class MojamComponent extends Canvas implements Runnable,
 			MojamComponent mc = new MojamComponent();
 			getParent().add(mc);
 			mc.start();
-			
-			
 
 		} else if (button.getId() == GuiMenu.START_GAME_ID) {
 			clearMenus();
@@ -619,41 +620,42 @@ public class MojamComponent extends Canvas implements Runnable,
 			}
 		} else if (button.getId() == GuiMenu.EXIT_GAME_ID) {
 			System.exit(0);
-		} else if (button.getId() == GuiMenu.RETURN_ID){
+		} else if (button.getId() == GuiMenu.RETURN_ID) {
 			synchronizer.addCommand(new PauseCommand(false));
 			keys.tick();
-		} else if (button.getId() == GuiMenu.END_GAME_ID){
+		} else if (button.getId() == GuiMenu.END_GAME_ID) {
 			popMenu();
-			synchronizer.addCommand(new EndGameCommand(1-localId));
-			
-		} else if (button.getId() == GuiMenu.FPS_ID){
+			synchronizer.addCommand(new EndGameCommand(1 - localId));
+
+		} else if (button.getId() == GuiMenu.FPS_ID) {
 			CheckBox box = (CheckBox) button;
 			showFPS = box.isChecked();
-						
-		}else if (button.getId() == GuiMenu.BACK_ID){
-			popMenu();			
-		}else if (button.getId() == GuiMenu.SEND_ID){
+
+		} else if (button.getId() == GuiMenu.BACK_ID) {
+			popMenu();
+		} else if (button.getId() == GuiMenu.SEND_ID) {
 			ChatOverlay chat = (ChatOverlay) menuStack.peek();
 			chatting = false;
 			popMenu();
-			String message=chat.getMessage();
-			if(message != null){
+			String message = chat.getMessage();
+			if (message != null) {
 				synchronizer.addCommand(new ChatCommand(message));
 			}
 			keys.tick();
-			
+
 		}
-		
+
 	}
 
 	private void cleanUp() {
+		soundPlayer.stopMusic();
 		level = null;
 		player = null;
-		synchronizer=null;
+		synchronizer = null;
 		emptyCursor = null;
-		if(isMultiplayer){
-			packetLink=null;
-			if(isServer){
+		if (isMultiplayer) {
+			packetLink = null;
+			if (isServer) {
 				serverSocket = null;
 			}
 		}

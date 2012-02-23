@@ -1,8 +1,8 @@
 #ignore these files.  Allows you to use add . or commit -a without worrying about them
 
 #these ones are ignored so that we don't waste space with compiled files or with duplicate files of resources
+CatacombSnatchReloade*.jar
 *.class
-*.jar
 bin/*
 #settings are ignored so noones eclipse settings are screwed up
 .settings/*

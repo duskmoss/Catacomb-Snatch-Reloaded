@@ -7,34 +7,33 @@ public class ScrollingMenu extends GuiMenu {
 	protected int LAST_ITEM;
 	protected int FIRST_ITEM;
 	protected int INITIAL;
-	
+
 	protected int returnItem;
-	
-	private int HEIGHT=-1;
-	
-	
+
+	private int HEIGHT = -1;
+
 	protected int selectedItem = 0;
-	
-	
-	public ScrollingMenu(int init, int last, int first)
-	{
+
+	public ScrollingMenu(int init, int last, int first) {
 		super();
-		LAST_ITEM=last;
-		FIRST_ITEM=first;
-		INITIAL=init;
+		LAST_ITEM = last;
+		FIRST_ITEM = first;
+		INITIAL = init;
 	}
+
 	public int getNextHeight() {
-		if(HEIGHT==-1){
-			HEIGHT=INITIAL;
-		}else{
+		if (HEIGHT == -1) {
+			HEIGHT = INITIAL;
+		} else {
 			HEIGHT += 40;
 		}
 		return HEIGHT;
 	}
-	public int getSameHeight(){
+
+	public int getSameHeight() {
 		return HEIGHT;
 	}
-	
+
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
@@ -50,7 +49,7 @@ public class ScrollingMenu extends GuiMenu {
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			e.consume();
 			buttons.get(selectedItem).postClick();
-		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			e.consume();
 			buttons.get(returnItem).postClick();
 		}

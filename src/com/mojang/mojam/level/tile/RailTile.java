@@ -2,7 +2,6 @@ package com.mojang.mojam.level.tile;
 
 import com.mojang.mojam.level.Level;
 import com.mojang.mojam.math.Facing;
-import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
@@ -36,7 +35,7 @@ public class RailTile extends Tile {
 
 	@Override
 	public boolean isBuildable() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -76,21 +75,6 @@ public class RailTile extends Tile {
 	@Override
 	public int getCost() {
 		return 50;
-	}
-
-	public int getRandomDirection() {
-		return getRandomDirection(-1);
-	}
-
-	public int getRandomDirection(int except) {
-		int connCount = 0;
-		int[] tmp = new int[4];
-		for (int i = 0; i < 4; ++i)
-			if (i != except && connections[i]) {
-				tmp[connCount++] = i;
-			}
-		return connCount > 0 ? tmp[TurnSynchronizer.synchedRandom
-				.nextInt(connCount)] : -1;
 	}
 
 	public boolean remove() {

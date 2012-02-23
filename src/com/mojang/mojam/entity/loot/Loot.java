@@ -11,7 +11,6 @@ import com.mojang.mojam.screen.Screen;
 public class Loot extends Entity {
 	public double xa, ya, za;
 	public double z;
-	public Entity owner;
 	public int life;
 	public int takeTime = 0;
 	public int animTime = 0;

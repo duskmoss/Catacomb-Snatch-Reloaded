@@ -14,10 +14,10 @@ public class JoinGameMenu extends GuiMenu {
 
 	public JoinGameMenu() {
 		super();
-		textHeight=100;
-		joinButton = addButton(new MenuButton(TitleMenu.PERFORM_JOIN_ID, 3, 100,
+		textHeight = 100;
+		joinButton = addButton(new MenuButton(GuiMenu.PERFORM_JOIN_ID, 3, 100,
 				140));
-		addButton(new MenuButton(TitleMenu.CANCEL_JOIN_ID, 4, 250, 140));
+		addButton(new MenuButton(GuiMenu.CANCEL_JOIN_ID, 4, 250, 140));
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class JoinGameMenu extends GuiMenu {
 
 		screen.clear(0);
 		Font.draw(screen, "Enter IP of Host:", 100, textHeight);
-		Font.draw(screen, TitleMenu.ip + "-", 100, textHeight+20);
+		Font.draw(screen, TitleMenu.ip + "-", 100, textHeight + 20);
 
 		super.render(screen);
 	}
