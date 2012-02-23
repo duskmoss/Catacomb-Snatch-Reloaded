@@ -6,27 +6,25 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
 public class WinMenu extends ScrollingMenu {
-		
+
 	private int winningPlayer;
 	private final int gameWidth;
-	
+
 	private int textHeight;
 	public final int buttonCenter;
 
 	public WinMenu(int gameWidth, int gameHeight, int winningPlayer) {
 		super(160, 0, 0);
 		returnItem = 0;
-		
+
 		this.winningPlayer = winningPlayer;
 		this.gameWidth = gameWidth;
-		
-		
 
 		textHeight = getNextHeight();
-		buttonCenter=((gameWidth-MenuButton.width)/2);
-		
-		addButton(new MenuButton(TitleMenu.RESTART_GAME_ID, 6,
-				buttonCenter, getNextHeight()));
+		buttonCenter = ((gameWidth - MenuButton.width) / 2);
+
+		addButton(new MenuButton(GuiMenu.RESTART_GAME_ID, 6, buttonCenter,
+				getNextHeight()));
 	}
 
 	@Override
@@ -35,16 +33,14 @@ public class WinMenu extends ScrollingMenu {
 		screen.blit(Art.gameOverScreen, 0, 0);
 
 		String msg = "";
-		if (winningPlayer == 0){
+		if (winningPlayer == 0) {
 			msg = "LORD LARD WINS WOOHOO";
 		}
-		if (winningPlayer == 1){
+		if (winningPlayer == 1) {
 			msg = "HERR VON SPECK WINS YAY";
 		}
-		int textWidth = msg.length()*8;
-		int textCenter = ((gameWidth-textWidth)/2);
+		int textCenter = ((gameWidth - Font.getStringWidth(msg)) / 2);
 		Font.draw(screen, msg, textCenter, textHeight);
-		
 
 		super.render(screen);
 

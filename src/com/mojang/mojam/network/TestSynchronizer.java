@@ -58,7 +58,6 @@ public class TestSynchronizer {
 		@Override
 		public void run() {
 
-			
 			while (true) {
 				packetLink.tick();
 				if (turnSynchronizer.preTurn()) {

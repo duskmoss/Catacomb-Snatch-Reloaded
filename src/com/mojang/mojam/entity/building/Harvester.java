@@ -152,7 +152,6 @@ public class Harvester extends Building implements LootCollector {
 			screen.blit(image, pos.x - image.w / 2, pos.y - image.h + 8);
 		}
 
-		
 	}
 
 	@Override

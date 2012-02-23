@@ -20,6 +20,7 @@ public class Enemy extends Mob {
 			}
 		}
 	}
+
 	@Override
 	public Bitmap getSprite() {
 		// TODO Auto-generated method stub

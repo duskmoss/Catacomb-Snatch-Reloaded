@@ -25,21 +25,24 @@ public class InputHandler implements KeyListener {
 		mappings.put(KeyEvent.VK_Z, keys.use);
 		mappings.put(KeyEvent.VK_R, keys.build);
 		mappings.put(KeyEvent.VK_E, keys.use);
-		
+
 		mappings.put(KeyEvent.VK_ESCAPE, keys.pause);
-		
+
 		mappings.put(KeyEvent.VK_ENTER, keys.chat);
 		mappings.put(KeyEvent.VK_T, keys.chat);
 	}
 
+	@Override
 	public void keyPressed(KeyEvent ke) {
 		toggle(ke, true);
 	}
 
+	@Override
 	public void keyReleased(KeyEvent ke) {
 		toggle(ke, false);
 	}
 
+	@Override
 	public void keyTyped(KeyEvent ke) {
 	}
 

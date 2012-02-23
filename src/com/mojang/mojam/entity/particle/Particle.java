@@ -8,7 +8,6 @@ import com.mojang.mojam.screen.Screen;
 public class Particle extends Entity {
 	public double xa, ya, za;
 	public double z;
-	public Entity owner;
 	public int life;
 
 	public Particle(double x, double y, double xa, double ya) {

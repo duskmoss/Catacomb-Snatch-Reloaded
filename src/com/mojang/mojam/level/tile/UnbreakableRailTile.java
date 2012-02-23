@@ -9,4 +9,9 @@ public class UnbreakableRailTile extends RailTile {
 	public boolean remove() {
 		return false;
 	}
+
+	@Override
+	public boolean isBuildable() {
+		return false;
+	}
 }

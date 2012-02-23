@@ -7,17 +7,15 @@ import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Screen;
 
 public class InvalidHostMenu extends GuiMenu {
-	
-	
 
 	private int textHeight;
 
 	public InvalidHostMenu() {
 		super();
-		textHeight=100;
-		addButton(new MenuButton(TitleMenu.BACK_ID, 4, 250, 140));
+		textHeight = 100;
+		addButton(new MenuButton(GuiMenu.BACK_ID, 4, 250, 140));
 	}
-	
+
 	@Override
 	public void render(Screen screen) {
 

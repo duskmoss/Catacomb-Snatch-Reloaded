@@ -15,14 +15,22 @@ import com.mojang.mojam.network.TurnSynchronizer;
 
 public class SoundPlayer {
 
+	public static final int BACKGROUND_ID = 1000;
+	public static final int TITLE_ID = 1001;
+	public static final int ENDING_ID = 1002;
+
+	private static final String BACKGROUND_TRACK = "background music";
+	private static final String TITLE_TRACK = "title music";
+	private static final String ENDING_TRACK = "ending music";
+
+	private static final int MAX_SOURCES_PER_SOUND = 5;
+
 	private final Class<? extends Library> libraryType;
 	private SoundSystem soundSystem;
 	private boolean oggPlaybackSupport = true;
 	private boolean wavPlaybackSupport = true;
 	private boolean muted = false;
-
-	private static final String BACKGROUND_TRACK = "Background music";
-	private static final int MAX_SOURCES_PER_SOUND = 5;
+	private int playingMusic = 0;
 
 	public SoundPlayer() {
 		libraryType = LibraryJavaSound.class;
@@ -61,21 +69,82 @@ public class SoundPlayer {
 		return false;
 	}
 
-	public void startBackgroundMusic() {
+	private void startBackgroundMusic() {
+		playingMusic = BACKGROUND_ID;
 		String backgroundTrack = "/res/sound/Background "
 				+ (TurnSynchronizer.synchedRandom.nextInt(4) + 1) + ".ogg";
-		if (!isMuted() && hasOggPlaybackSupport()
-				&& !isPlaying(BACKGROUND_TRACK)) {
+		if (!isMuted() && hasOggPlaybackSupport()) {
 			soundSystem.backgroundMusic(BACKGROUND_TRACK,
 					SoundPlayer.class.getResource(backgroundTrack),
 					backgroundTrack, true);
 		}
 	}
 
-	public void stopBackgroundMusic() {
+	private void stopBackgroundMusic() {
 		if (hasOggPlaybackSupport()) {
 			soundSystem.stop(BACKGROUND_TRACK);
 		}
+	}
+
+	private void playTitleMusic() {
+		playingMusic = TITLE_ID;
+		String titleTrack = "/res/sound/Title.ogg";
+		if (!isMuted() && hasOggPlaybackSupport()) {
+			soundSystem
+					.backgroundMusic(TITLE_TRACK,
+							SoundPlayer.class.getResource(titleTrack),
+							titleTrack, true);
+		}
+	}
+
+	private void stopTitleMusic() {
+		if (hasOggPlaybackSupport()) {
+			soundSystem.stop(TITLE_TRACK);
+		}
+	}
+
+	private void playEndingMusic() {
+		playingMusic = ENDING_ID;
+		String endingTrack = "/res/sound/Ending.ogg";
+		if (!isMuted() && hasOggPlaybackSupport()) {
+			soundSystem.backgroundMusic(ENDING_TRACK,
+					SoundPlayer.class.getResource(endingTrack), endingTrack,
+					true);
+		}
+	}
+
+	private void stopEndingMusic() {
+		if (hasOggPlaybackSupport()) {
+			soundSystem.stop(ENDING_TRACK);
+		}
+	}
+
+	public void playMusic(int id) {
+		stopMusic();
+		if (id == BACKGROUND_ID) {
+			startBackgroundMusic();
+			return;
+		}
+		if (id == TITLE_ID) {
+			playTitleMusic();
+		}
+		if (id == ENDING_ID) {
+			playEndingMusic();
+		}
+
+	}
+
+	public void stopMusic() {
+		if (playingMusic == BACKGROUND_ID) {
+			stopBackgroundMusic();
+		}
+		if (playingMusic == TITLE_ID) {
+			stopTitleMusic();
+		}
+		if (playingMusic == ENDING_ID) {
+			stopEndingMusic();
+		}
+		playingMusic = 0;
 	}
 
 	private Set<String> loaded = new TreeSet<String>();

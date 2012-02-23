@@ -40,10 +40,10 @@ public class Bullet extends Entity {
 
 	@Override
 	protected boolean shouldBlock(Entity e) {
-		if (e instanceof Bullet){
+		if (e instanceof Bullet) {
 			return false;
 		}
-		if(e instanceof Mob){
+		if (e instanceof Mob) {
 			Mob m = (Mob) e;
 			return !m.isFriendOf(owner);
 		}

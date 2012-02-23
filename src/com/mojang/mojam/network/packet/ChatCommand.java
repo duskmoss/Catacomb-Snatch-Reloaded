@@ -9,19 +9,19 @@ import com.mojang.mojam.network.NetworkCommand;
 public class ChatCommand extends NetworkCommand {
 
 	byte[] message;
-	
-	public ChatCommand(){
-		message="".getBytes();
+
+	public ChatCommand() {
+		message = "".getBytes();
 	}
-	
+
 	public ChatCommand(String msg) {
-		message=msg.getBytes();
-		
+		message = msg.getBytes();
+
 	}
 
 	@Override
 	public void read(DataInputStream dis) throws IOException {
-		message = new byte[dis.readInt()];		
+		message = new byte[dis.readInt()];
 		dis.readFully(message);
 
 	}
@@ -32,8 +32,8 @@ public class ChatCommand extends NetworkCommand {
 		dos.write(message);
 
 	}
-	
-	public String getMessage(){
+
+	public String getMessage() {
 		return new String(message);
 	}
 

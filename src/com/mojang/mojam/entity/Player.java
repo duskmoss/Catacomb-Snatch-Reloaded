@@ -120,28 +120,28 @@ public class Player extends Mob implements LootCollector {
 		if (keys.right.isDown) {
 			xa++;
 		}
-		
+
 		double xaf = 0;
 		double yaf = 0;
-		boolean fireIsDown=false;
-		
+		boolean fireIsDown = false;
+
 		if (keys.fireup.isDown) {
 			yaf--;
-			fireIsDown=true;
+			fireIsDown = true;
 		}
 		if (keys.firedown.isDown) {
 			yaf++;
-			fireIsDown=true;
+			fireIsDown = true;
 		}
 		if (keys.fireleft.isDown) {
 			xaf--;
-			fireIsDown=true;
+			fireIsDown = true;
 		}
 		if (keys.fireright.isDown) {
 			xaf++;
-			fireIsDown=true;
+			fireIsDown = true;
 		}
-		
+
 		if (!fireIsDown && xa * xa + ya * ya != 0) {
 			xAim *= 0.7;
 			yAim *= 0.7;
@@ -289,7 +289,7 @@ public class Player extends Mob implements LootCollector {
 			if (keys.use.wasPressed()) {
 				Vec2 buildPos = pos.clone();
 				Tile tile = level.getTile(buildPos);
-				boolean allowed=false;
+				boolean allowed = false;
 				if (tile != null && tile.isBuildable()) {
 					allowed = true;
 				}
@@ -546,7 +546,7 @@ public class Player extends Mob implements LootCollector {
 
 	public void addScore(int score) {
 		this.score += score;
-		
+
 	}
 
 	public int getScore() {

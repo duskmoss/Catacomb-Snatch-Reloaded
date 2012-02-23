@@ -11,9 +11,9 @@ public class PauseCommand extends NetworkCommand {
 	private boolean newStatus;
 
 	public PauseCommand() {
-	
+
 	}
-	
+
 	public PauseCommand(boolean nextState) {
 		this.newStatus = nextState;
 	}
@@ -29,6 +29,7 @@ public class PauseCommand extends NetworkCommand {
 		dos.writeBoolean(newStatus);
 
 	}
+
 	public boolean isPause() {
 		return newStatus;
 	}
