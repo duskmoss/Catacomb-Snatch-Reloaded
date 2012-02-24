@@ -20,7 +20,6 @@ import com.mojang.mojam.entity.building.TreasurePile;
 import com.mojang.mojam.entity.building.Turret;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Font;
-import com.mojang.mojam.gui.Notifications;
 import com.mojang.mojam.level.tile.DestroyableWallTile;
 import com.mojang.mojam.level.tile.FloorTile;
 import com.mojang.mojam.level.tile.SandTile;
@@ -388,8 +387,6 @@ public class Level {
 				removeFromEntityMap(e);
 			}
 		}
-
-		Notifications.getInstance().tick();
 	}
 
 	private boolean hasSeen(int x, int y) {
@@ -599,8 +596,6 @@ public class Level {
 				/ TARGET_SCORE + "%", 140, screen.h - 20);
 		Font.draw(screen, "Herr Von Speck: " + players.get(1).getScore() * 100
 				/ TARGET_SCORE + "%", 56, screen.h - 36);
-
-		Notifications.getInstance().render(screen);
 	}
 
 	private boolean canSee(int x, int y) {

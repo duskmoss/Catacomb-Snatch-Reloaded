@@ -100,6 +100,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	private boolean chatting;
 
 	private ChatStack chats = new ChatStack(5);
+	private ChatStack notes = new ChatStack(3);
+
 	private Thread parentThread;
 
 	public MojamComponent() {
@@ -327,6 +329,7 @@ public class MojamComponent extends Canvas implements Runnable,
 				fps = frames;
 				frames = 0;
 				chats.trim();
+				notes.trim();
 			}
 		}
 		JPanel panel = (JPanel) getParent();
@@ -362,6 +365,7 @@ public class MojamComponent extends Canvas implements Runnable,
 			Font.draw(screen, player.health + " / 10", 340, screen.h - 19);
 			Font.draw(screen, "" + player.money, 340, screen.h - 33);
 			chats.render(screen, 0, 300);
+			notes.render(screen, ChatStack.CENTER, MojamComponent.GAME_HEIGHT / 5);
 		}
 
 		g.setColor(Color.BLACK);
@@ -501,7 +505,12 @@ public class MojamComponent extends Canvas implements Runnable,
 		}
 		if (packet instanceof ChatCommand) {
 			ChatCommand cc = (ChatCommand) packet;
-			chats.push(cc.getMessage());
+			switch(cc.getType()) {
+			case ChatCommand.CHAT_TYPE:	chats.push(cc.getMessage());
+										break;
+			case ChatCommand.NOTE_TYPE:	notes.push(cc.getMessage());
+										break;
+			}
 		}
 
 	}

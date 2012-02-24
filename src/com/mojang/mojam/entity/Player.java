@@ -12,12 +12,12 @@ import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.entity.mob.RailDroid;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.entity.particle.Sparkle;
-import com.mojang.mojam.gui.Notifications;
 import com.mojang.mojam.level.tile.RailTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
 import com.mojang.mojam.network.EndGameCommand;
 import com.mojang.mojam.network.TurnSynchronizer;
+import com.mojang.mojam.network.packet.ChatCommand;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
@@ -527,9 +527,7 @@ public class Player extends Mob implements LootCollector {
 			regenDelay = REGEN_INTERVAL;
 
 			if (health <= 0) {
-				Notifications.getInstance().add(
-						(team == Team.Team1 ? "Lord Lard" : "Herr Von Speck")
-								+ " has died!");
+				MojamComponent.synchronizer.addCommand(new ChatCommand((name + " has died!"),ChatCommand.NOTE_TYPE));
 				carrying = null;
 				dropAllMoney();
 				pos.set(startX, startY);

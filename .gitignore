@@ -5,6 +5,7 @@
 *.class
 bin/*
 !lib/*.jar
+anttemplate.xml
 #settings are ignored so noones eclipse settings are screwed up
 .settings/*
 #notes are ignored because I like to keep a notes sheet in the project directory
