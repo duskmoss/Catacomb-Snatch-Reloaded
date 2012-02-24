@@ -2,6 +2,7 @@ package com.mojang.mojam.gui.menu;
 
 import java.awt.event.KeyEvent;
 
+import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Screen;
@@ -13,9 +14,9 @@ public class ChatOverlay extends GuiMenu implements Overlay {
 	private Button sendButton;
 
 	public ChatOverlay(int player) {
-		if (player == 0) {
+		if (player == Team.Team1) {
 			header = "Lord Lard:";
-		} else if (player == 1) {
+		} else if (player == Team.Team2) {
 			header = "Herr Von Speck:";
 		}
 		sendButton = addButton(new Button(GuiMenu.SEND_ID));

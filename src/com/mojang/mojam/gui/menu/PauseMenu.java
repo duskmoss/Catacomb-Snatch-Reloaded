@@ -1,5 +1,6 @@
 package com.mojang.mojam.gui.menu;
 
+import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.MenuButton;
 import com.mojang.mojam.gui.CheckBox;
 import com.mojang.mojam.gui.Font;
@@ -43,10 +44,10 @@ public class PauseMenu extends ScrollingMenu implements Overlay {
 
 		screen.blit(Art.pauseScreen, 0, 0);
 
-		if (player == 0) {
+		if (player == Team.Team1) {
 			msg = "by LORD LARD";
 		}
-		if (player == 1) {
+		if (player == Team.Team2) {
 			msg = "by HERR VON SPECK";
 		}
 		textCenter = ((gameWidth - Font.getStringWidth(msg)) / 2);

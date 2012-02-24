@@ -1,5 +1,6 @@
 package com.mojang.mojam.gui.menu;
 
+import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.MenuButton;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Art;
@@ -33,10 +34,10 @@ public class WinMenu extends ScrollingMenu {
 		screen.blit(Art.gameOverScreen, 0, 0);
 
 		String msg = "";
-		if (winningPlayer == 0) {
+		if (winningPlayer == Team.Team1) {
 			msg = "LORD LARD WINS WOOHOO";
 		}
-		if (winningPlayer == 1) {
+		if (winningPlayer == Team.Team2) {
 			msg = "HERR VON SPECK WINS YAY";
 		}
 		int textCenter = ((gameWidth - Font.getStringWidth(msg)) / 2);

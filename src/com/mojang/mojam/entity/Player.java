@@ -16,6 +16,7 @@ import com.mojang.mojam.gui.Notifications;
 import com.mojang.mojam.level.tile.RailTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
+import com.mojang.mojam.network.EndGameCommand;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
@@ -57,6 +58,7 @@ public class Player extends Mob implements LootCollector {
 
 	private int regenDelay = 0;
 	private int score;
+	private String name;
 
 	public Player(Keys keys, int x, int y, int team) {
 		super(x, y, team);
@@ -66,6 +68,13 @@ public class Player extends Mob implements LootCollector {
 		startY = y;
 
 		money = 0;
+		
+		if(team==Team.Team1){
+			name="Lord Lard";
+		}
+		if(team==Team.Team2){
+			name="Herr Von Speck";
+		}
 
 	}
 
@@ -546,6 +555,9 @@ public class Player extends Mob implements LootCollector {
 
 	public void addScore(int score) {
 		this.score += score;
+		if(score>level.TARGET_SCORE){
+			MojamComponent.synchronizer.addCommand(new EndGameCommand(team));
+		}
 
 	}
 

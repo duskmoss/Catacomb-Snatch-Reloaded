@@ -5,13 +5,13 @@ import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 
-public class Mummy extends Mob {
+public class Mummy extends Enemy {
 	public int facing;
 	public int walkTime;
 	public int stepTime;
 
 	public Mummy(double x, double y) {
-		super(x, y, Team.Enemy);
+		super(x, y);
 		setPos(x, y);
 		setStartHealth(7);
 		dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI * 2;
@@ -64,7 +64,7 @@ public class Mummy extends Mob {
 
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
-		super.collide(entity, xa, 2);
+		super.collide(entity, xa, ya, 2);
 
 	}
 
