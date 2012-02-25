@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.mojam.network.NetworkCommand;
-import com.mojang.mojam.network.Packet;
 import com.mojang.mojam.network.PacketListener;
 
 public class TurnPacket extends Packet {

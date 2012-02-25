@@ -1,14 +1,20 @@
 package com.mojang.mojam.entity.building;
 
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
 import com.mojang.mojam.entity.mob.Team;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
 public class ShopItem extends Building {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5576786380153480591L;
 
 	private int facing = 0;
 
@@ -61,8 +67,8 @@ public class ShopItem extends Building {
 
 	@Override
 	public void use(Entity user) {
-		if (user instanceof Player && ((Player) user).getTeam() == team) {
-			Player player = (Player) user;
+		if (user instanceof Player && ((LocalPlayer) user).getTeam() == team) {
+			LocalPlayer player = (LocalPlayer) user;
 			if (player.carrying == null && player.getMoney() >= COST[type]) {
 				player.payCost(COST[type]);
 				Building item = null;

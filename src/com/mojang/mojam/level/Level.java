@@ -13,12 +13,13 @@ import javax.imageio.ImageIO;
 
 import com.mojang.mojam.MojamComponent;
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
 import com.mojang.mojam.entity.building.ShopItem;
 import com.mojang.mojam.entity.building.SpawnerEntity;
 import com.mojang.mojam.entity.building.TreasurePile;
 import com.mojang.mojam.entity.building.Turret;
 import com.mojang.mojam.entity.mob.Team;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.level.tile.DestroyableWallTile;
 import com.mojang.mojam.level.tile.FloorTile;
@@ -46,7 +47,7 @@ public class Level {
 	private boolean seen[];
 	final int[] neighbourOffsets;
 
-	private List<Player> players = new ArrayList<Player>(2);
+	public List<Player> players = new ArrayList<Player>(2);
 
 	@SuppressWarnings("unchecked")
 	public Level(int width, int height) {
@@ -355,7 +356,7 @@ public class Level {
 			if (tile instanceof FloorTile) {
 				double r = 32 * 8;
 				if (getEntities(new BB(null, x - r, y - r, x + r, y + r),
-						Player.class).size() == 0) {
+						LocalPlayer.class).size() == 0) {
 					r = 32 * 8;
 					if (getEntities(new BB(null, x - r, y - r, x + r, y + r),
 							SpawnerEntity.class).size() == 0) {

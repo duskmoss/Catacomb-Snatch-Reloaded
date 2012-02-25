@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.mojang.mojam.network.Packet;
 
 public class StartGamePacket extends Packet {
 

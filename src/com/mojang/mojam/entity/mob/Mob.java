@@ -117,11 +117,11 @@ public abstract class Mob extends Entity {
 
 		level.addEntity(new EnemyDieAnimation(pos.x, pos.y));
 
-		MojamComponent.soundPlayer.playSound(getDeatchSound(), (float) pos.x,
+		MojamComponent.soundPlayer.playSound(getDeathSound(), (float) pos.x,
 				(float) pos.y);
 	}
 
-	public String getDeatchSound() {
+	public String getDeathSound() {
 		return "/res/sound/Explosion.wav";
 	}
 

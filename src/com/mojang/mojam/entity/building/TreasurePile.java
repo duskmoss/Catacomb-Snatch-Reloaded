@@ -6,6 +6,10 @@ import com.mojang.mojam.screen.Bitmap;
 
 public class TreasurePile extends Building {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1345048161540262663L;
 	private int treasures = 40;
 
 	public TreasurePile(double x, double y, int team) {

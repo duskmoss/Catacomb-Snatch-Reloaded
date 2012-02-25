@@ -3,6 +3,8 @@ package com.mojang.mojam.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mojang.mojam.network.packet.NetworkCommand;
+
 public class PlayerTurnCommands {
 
 	private List<List<PlayerCommands>> playerCommands;
@@ -23,17 +25,13 @@ public class PlayerTurnCommands {
 					break;
 				}
 			}
-			if (!found) {
-				return false;
-			}
 		}
 		return true;
 	}
 
 	public void addPlayerCommands(int playerId, int turnNumber,
 			List<NetworkCommand> commands) {
-		playerCommands.get(playerId).add(
-				new PlayerCommands(turnNumber, commands));
+		playerCommands.get(playerId).add(new PlayerCommands(turnNumber, commands));
 	}
 
 	public List<NetworkCommand> popPlayerCommands(int playerId, int turnNumber) {

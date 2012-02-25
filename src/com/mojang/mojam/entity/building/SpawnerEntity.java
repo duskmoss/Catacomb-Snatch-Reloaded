@@ -11,6 +11,11 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 
 public class SpawnerEntity extends Building {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6060078466052244075L;
+
 	public static final int SPAWN_INTERVAL = 60 * 4;
 
 	public int spawnTime = 0;
