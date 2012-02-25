@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.mojang.mojam.network.packet.Packet;
+
 public class NetworkPacketLink implements PacketLink {
 
 	private static final int SEND_BUFFER_SIZE = 1024 * 5;
@@ -46,8 +48,7 @@ public class NetworkPacketLink implements PacketLink {
 			public void run() {
 				try {
 					while (isRunning && !isQuitting) {
-						while (readTick())
-							;
+						while (readTick());
 
 						try {
 							sleep(2L);
@@ -64,8 +65,7 @@ public class NetworkPacketLink implements PacketLink {
 			public void run() {
 				try {
 					while (isRunning) {
-						while (writeTick())
-							;
+						while (writeTick());
 
 						try {
 							if (outputStream != null)

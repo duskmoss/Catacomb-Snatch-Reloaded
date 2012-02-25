@@ -3,10 +3,11 @@ package com.mojang.mojam.entity.building;
 import java.util.Random;
 
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
 import com.mojang.mojam.entity.animation.SmokeAnimation;
 import com.mojang.mojam.entity.loot.Loot;
 import com.mojang.mojam.entity.loot.LootCollector;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
@@ -15,13 +16,17 @@ import com.mojang.mojam.screen.Screen;
 
 public class Harvester extends Building implements LootCollector {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3565206775150227025L;
 	private int capacity = 5000;
 	private int money = 0;
 	private int time = 0;
 	private int harvestingTicks = 20;
 	private boolean isHarvesting = false;
 	private boolean isEmptying = false;
-	private Player emptyingPlayer = null;
+	private LocalPlayer emptyingPlayer = null;
 	private int emptyingSpeed = 50;
 	private double radius;
 	private int[] upgradeRadius = new int[] { (int) (1.5 * Tile.WIDTH),
@@ -169,10 +174,6 @@ public class Harvester extends Building implements LootCollector {
 	public void flash() {
 	}
 
-	@Override
-	public int getMoney() {
-		return money;
-	}
 
 	public void dropAllMoney() {
 
@@ -193,7 +194,7 @@ public class Harvester extends Building implements LootCollector {
 		super.use(user);
 		isEmptying = true;
 		if (user instanceof Player) {
-			emptyingPlayer = (Player) user;
+			emptyingPlayer = (LocalPlayer) user;
 		}
 	}
 }

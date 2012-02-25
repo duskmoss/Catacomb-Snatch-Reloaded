@@ -12,6 +12,10 @@ import com.mojang.mojam.screen.Bitmap;
 
 public class Bomb extends Building {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3694796430481116383L;
 	public static final double BOMB_DISTANCE = 50;
 
 	public Bomb(double x, double y) {

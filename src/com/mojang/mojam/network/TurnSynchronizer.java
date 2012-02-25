@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.mojang.mojam.network.packet.NetworkCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;
 
@@ -13,7 +14,7 @@ public class TurnSynchronizer {
 	public static long synchedSeed;
 
 	public static final int TURN_QUEUE_LENGTH = 3;
-	public static final int TICKS_PER_TURN = 5;
+	public static final int TICKS_PER_TURN = 20;
 
 	private int currentTurnLength = TICKS_PER_TURN;
 
@@ -33,19 +34,17 @@ public class TurnSynchronizer {
 	private boolean isStarted;
 
 	public TurnSynchronizer(CommandListener commandListener,
-			PacketLink packetLink, int localId, int numPlayers) {
+			PacketLink packetLink, int localId, int nPlayers) {
 
 		this.commandListener = commandListener;
 		this.packetLink = packetLink;
 		this.localId = localId;
-		this.numPlayers = numPlayers;
+		this.numPlayers = nPlayers;
 		this.playerCommands = new PlayerTurnCommands(numPlayers);
 
 		for (int i = 0; i < turnInfo.length; i++) {
-			turnInfo[i] = new TurnInfo(i, numPlayers);
+			turnInfo[i] = new TurnInfo(i);
 		}
-		turnInfo[0].isDone = true;
-		turnInfo[1].isDone = true;
 
 		synchedSeed = synchedRandom.nextLong();
 		synchedRandom.setSeed(synchedSeed);
@@ -71,18 +70,21 @@ public class TurnSynchronizer {
 				turnInfo[currentTurn].isCommandsPopped = true;
 
 				for (int i = 0; i < numPlayers; i++) {
+					if(i==localId){
+						continue;
+					}
 					List<NetworkCommand> commands = playerCommands
 							.popPlayerCommands(i, turnSequence);
 					if (commands != null) {
 						for (NetworkCommand command : commands) {
-							commandListener.handle(i, command);
+							command.handle(i, commandListener);
 						}
 					}
 				}
 			}
 			return true;
 		} else {
-			// System.out.println("Stalled");
+			 System.out.println("Stalled");
 		}
 		return false;
 	}
@@ -99,8 +101,7 @@ public class TurnSynchronizer {
 			turnSequence++;
 			currentTurnTickCount = 0;
 
-			playerCommands.addPlayerCommands(localId, commandSequence,
-					nextTurnCommands);
+			playerCommands.addPlayerCommands(localId, commandSequence, nextTurnCommands);
 			sendLocalTurn(turnInfo[commandSequence % turnInfo.length]);
 			commandSequence++;
 			nextTurnCommands = null;
@@ -145,7 +146,7 @@ public class TurnSynchronizer {
 		public boolean isDone;
 		private int turnNumber;
 
-		public TurnInfo(int turnNumber, int numPlayers) {
+		public TurnInfo(int turnNumber) {
 			this.turnNumber = turnNumber;
 		}
 

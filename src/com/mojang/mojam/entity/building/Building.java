@@ -1,16 +1,22 @@
 package com.mojang.mojam.entity.building;
 
+import java.io.Serializable;
+
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.IUsable;
-import com.mojang.mojam.entity.Player;
 import com.mojang.mojam.entity.mob.Mob;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.math.BB;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
-public class Building extends Mob implements IUsable {
+public class Building extends Mob implements IUsable, Serializable {
+	
+	private static final long serialVersionUID = 4511300519202209008L;
+
 	public static final int SPAWN_INTERVAL = 60;
 
 	public int spawnTime = 0;
@@ -89,7 +95,7 @@ public class Building extends Mob implements IUsable {
 	private int maxUpgradeLevel = 0;
 	private int[] upgradeCosts = null;
 
-	public boolean upgrade(Player p) {
+	public boolean upgrade(LocalPlayer p) {
 		if (upgradeLevel >= maxUpgradeLevel)
 			return false;
 
@@ -116,7 +122,7 @@ public class Building extends Mob implements IUsable {
 	@Override
 	public void use(Entity user) {
 		if (user instanceof Player) {
-			((Player) user).pickup(this);
+			((LocalPlayer) user).pickup(this);
 		}
 	}
 

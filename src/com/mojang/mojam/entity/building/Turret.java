@@ -9,8 +9,11 @@ import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 
+
 public class Turret extends Building {
 
+
+	private static final long serialVersionUID = 4917885148408436047L;
 	private int delayTicks = 0;
 	private int delay;
 	private double radius;

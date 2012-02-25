@@ -4,6 +4,11 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 
 public class Base extends Building {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -839151877513979080L;
+
 	public Base(double x, double y, int team) {
 		super(x, y, team);
 		setStartHealth(20);

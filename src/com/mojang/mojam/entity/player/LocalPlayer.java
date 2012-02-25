@@ -1,28 +1,26 @@
-package com.mojang.mojam.entity;
+package com.mojang.mojam.entity.player;
 
 import java.util.Random;
 
 import com.mojang.mojam.Keys;
 import com.mojang.mojam.MojamComponent;
+import com.mojang.mojam.entity.Bullet;
+import com.mojang.mojam.entity.Entity;
+import com.mojang.mojam.entity.IUsable;
 import com.mojang.mojam.entity.animation.SmokePuffAnimation;
 import com.mojang.mojam.entity.building.Building;
 import com.mojang.mojam.entity.loot.Loot;
-import com.mojang.mojam.entity.loot.LootCollector;
-import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.entity.mob.RailDroid;
 import com.mojang.mojam.entity.mob.Team;
-import com.mojang.mojam.entity.particle.Sparkle;
 import com.mojang.mojam.level.tile.RailTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
-import com.mojang.mojam.network.EndGameCommand;
+import com.mojang.mojam.network.PacketHandler;
 import com.mojang.mojam.network.TurnSynchronizer;
-import com.mojang.mojam.network.packet.ChatCommand;
 import com.mojang.mojam.screen.Art;
-import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
-public class Player extends Mob implements LootCollector {
+public class LocalPlayer extends Player{
 
 	public static final int COST_RAIL = 10;
 	public static final int COST_DROID = 50;
@@ -30,54 +28,21 @@ public class Player extends Mob implements LootCollector {
 	public static final int REGEN_INTERVAL = 60 * 3;
 
 	public Keys keys;
-	public double xAim, yAim = 1;
-	public int shootDelay = 0;
 	public double xd, yd;
-	public int takeDelay = 0;
-	public int flashTime = 0;
-	public int suckRadius = 0;
-	public boolean wasShooting;
-	public int money;
-	private int facing = 0;
-	private int time = 0;
-	private int walkTime = 0;
 	private Entity selected = null;
 	static final int RailDelayTicks = 15;
 	private int lastRailTick = -999;
 	private final static int INTERACT_DISTANCE = 20 * 20; // Sqr
-	private int steps = 0;
-	private boolean isSeeing;
-	private int startX;
-	private int startY;
-	private int muzzleTicks = 0;
-	private double muzzleX = 0;
-	private double muzzleY = 0;
-	private int muzzleImage = 0;
-
-	private int nextWalkSmokeTick = 0;
-
 	private int regenDelay = 0;
-	private int score;
-	private String name;
 
-	public Player(Keys keys, int x, int y, int team) {
+	public LocalPlayer(Keys keys, int x, int y, int team, PacketHandler hand) {
 		super(x, y, team);
 		this.keys = keys;
-
-		startX = x;
-		startY = y;
-
-		money = 0;
-		
-		if(team==Team.Team1){
-			name="Lord Lard";
-		}
-		if(team==Team.Team2){
-			name="Herr Von Speck";
-		}
-
+		handler = hand;
 	}
 
+
+	
 	@Override
 	public void tick() {
 		time++;
@@ -94,10 +59,9 @@ public class Player extends Mob implements LootCollector {
 				regenDelay = REGEN_INTERVAL;
 			}
 		}
-		double xa = 0;
-		double ya = 0;
-		if (flashTime > 0) {
-			flashTime = 0;
+		
+		if(flashTime){
+			flashTime=false;
 		}
 		if (hurtTime > 0) {
 			hurtTime--;
@@ -108,8 +72,29 @@ public class Player extends Mob implements LootCollector {
 		if (muzzleTicks > 0) {
 			muzzleTicks--;
 		}
-		if (keys.up.isDown || keys.down.isDown || keys.left.isDown
-				|| keys.right.isDown) {
+		
+		double xa = 0;
+		double ya = 0;
+		moving=false;
+		
+		if (keys.up.isDown) {
+			ya--;
+			moving=true;
+		}
+		if (keys.down.isDown) {
+			ya++;
+			moving=true;
+		}
+		if (keys.left.isDown) {
+			xa--;
+			moving=true;
+		}
+		if (keys.right.isDown) {
+			xa++;
+			moving=true;
+		}
+		
+		if (moving) {
 			if ((carrying == null && steps % 10 == 0) || (steps % 20 == 0)) {
 				MojamComponent.soundPlayer.playSound("/res/sound/Step "
 						+ (TurnSynchronizer.synchedRandom.nextInt(2) + 1)
@@ -117,41 +102,30 @@ public class Player extends Mob implements LootCollector {
 			}
 			steps++;
 		}
-		if (keys.up.isDown) {
-			ya--;
-		}
-		if (keys.down.isDown) {
-			ya++;
-		}
-		if (keys.left.isDown) {
-			xa--;
-		}
-		if (keys.right.isDown) {
-			xa++;
-		}
+		
 
 		double xaf = 0;
 		double yaf = 0;
-		boolean fireIsDown = false;
+		firing = false;
 
 		if (keys.fireup.isDown) {
 			yaf--;
-			fireIsDown = true;
+			firing = true;
 		}
 		if (keys.firedown.isDown) {
 			yaf++;
-			fireIsDown = true;
+			firing = true;
 		}
 		if (keys.fireleft.isDown) {
 			xaf--;
-			fireIsDown = true;
+			firing = true;
 		}
 		if (keys.fireright.isDown) {
 			xaf++;
-			fireIsDown = true;
+			firing = true;
 		}
 
-		if (!fireIsDown && xa * xa + ya * ya != 0) {
+		if (!firing && moving) {
 			xAim *= 0.7;
 			yAim *= 0.7;
 			xAim += xa;
@@ -159,16 +133,18 @@ public class Player extends Mob implements LootCollector {
 			facing = (int) ((Math.atan2(-xAim, yAim) * 8 / (Math.PI * 2) + 8.5)) & 7;
 		}
 
-		if (fireIsDown && xaf * xaf + yaf * yaf != 0) {
+		if (firing) {
 			xAim *= 0.7;
 			yAim *= 0.7;
 			xAim += xaf;
 			yAim += yaf;
 			facing = (int) ((Math.atan2(-xAim, yAim) * 8 / (Math.PI * 2) + 8.5)) & 7;
 		}
+		
+		
 
 		if (xa != 0 || ya != 0) {
-			int facing2 = (int) ((Math.atan2(-xa, ya) * 8 / (Math.PI * 2) + 8.5)) & 7;
+			facing2 = (int) ((Math.atan2(-xa, ya) * 8 / (Math.PI * 2) + 8.5)) & 7;
 			int diff = facing - facing2;
 			if (diff >= 4) {
 				diff -= 8;
@@ -222,15 +198,13 @@ public class Player extends Mob implements LootCollector {
 		yBump *= 0.8;
 		muzzleImage = (muzzleImage + 1) & 3;
 
-		if (carrying == null && fireIsDown) {
+		if (carrying == null && firing) {
 			wasShooting = true;
 			if (takeDelay > 0) {
 				takeDelay--;
 			}
 			if (shootDelay-- <= 0) {
-				double dir = Math.atan2(yAim, xAim)
-						+ (TurnSynchronizer.synchedRandom.nextFloat() - TurnSynchronizer.synchedRandom
-								.nextFloat()) * 0.1;
+				double dir = Math.atan2(yAim, xAim) + (TurnSynchronizer.synchedRandom.nextFloat() - TurnSynchronizer.synchedRandom.nextFloat()) * 0.1;
 
 				xa = Math.cos(dir);
 				ya = Math.sin(dir);
@@ -355,16 +329,18 @@ public class Player extends Mob implements LootCollector {
 
 		}
 
-		if (isSeeing) {
-			level.reveal(x, y, 5);
-		}
+		handler.Sync(pos.x, pos.y, xAim, yAim, firing);
+
+		level.reveal(x, y, 5);
+
 	}
 
 	public void payCost(int cost) {
 		money -= cost;
 
 		while (cost > 0) {
-			double dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI
+			Random random = TurnSynchronizer.synchedRandom;
+			double dir = random.nextDouble() * Math.PI
 					* 2;
 			Loot loot = new Loot(pos.x, pos.y, Math.cos(dir), Math.sin(dir),
 					cost / 2);
@@ -380,95 +356,36 @@ public class Player extends Mob implements LootCollector {
 			money += s;
 	}
 
-	public void dropAllMoney() {
 
-		money /= 2;
-		while (money > 0) {
-			double dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI
-					* 2;
-			Loot loot = new Loot(pos.x, pos.y, Math.cos(dir), Math.sin(dir),
-					money / 2);
-			level.addEntity(loot);
-
-			money -= loot.getValue();
-		}
-		money = 0;
-	}
-
+	
 	@Override
 	public void render(Screen screen) {
-		Bitmap[][] sheet = Art.lordLard;
-		if (team == Team.Team2) {
-			sheet = Art.herrSpeck;
-		}
-
-		int frame = (walkTime / 4 % 6 + 6) % 6;
-
-		int facing = this.facing + (carrying != null ? 8 : 0);
-		double xmuzzle = muzzleX + ((facing == 0) ? 4 : 0);
-		double ymuzzle = muzzleY - ((facing == 0) ? 4 : 0);
-
-		boolean behind = (facing >= 3 && facing <= 5);
-
-		if (muzzleTicks > 0 && behind) {
-			screen.blit(Art.muzzle[muzzleImage][0], xmuzzle, ymuzzle);
-		}
-
-		if (hurtTime % 2 != 0) {
-			screen.colorBlit(sheet[frame][facing], pos.x - Tile.WIDTH / 2,
-					pos.y - Tile.HEIGHT / 2 - 8, 0x80ff0000);
-		} else if (flashTime > 0) {
-			screen.colorBlit(sheet[frame][facing], pos.x - Tile.WIDTH / 2,
-					pos.y - Tile.HEIGHT / 2 - 8, 0x80ffff80);
-		} else {
-			screen.blit(sheet[frame][facing], pos.x - Tile.WIDTH / 2, pos.y
-					- Tile.HEIGHT / 2 - 8);
-		}
-
-		if (muzzleTicks > 0 && !behind) {
-			screen.blit(Art.muzzle[muzzleImage][0], xmuzzle, ymuzzle);
-		}
-
-		renderCarrying(screen, (frame == 0 || frame == 3) ? -1 : 0);
+		super.render(screen);
+	}
+	
+	@Override 
+	public void pickup(Building b) {
+		super.pickup(b);
+		handler.pickup(b);
+		
+	}
+	
+	@Override
+	public void take(Loot loot) {
+		super.take(loot);
+		money += loot.getValue();
 	}
 
+	
 	@Override
 	public void collide(Entity entity, double xa, double ya) {
 		xd += xa * 0.4;
 		yd += ya * 0.4;
 	}
 
-	@Override
-	public void take(Loot loot) {
-		loot.remove();
-		level.addEntity(new Sparkle(pos.x, pos.y, -1, 0));
-		level.addEntity(new Sparkle(pos.x, pos.y, +1, 0));
-		money += loot.getValue();
-	}
 
-	@Override
-	public double getSuckPower() {
-		return suckRadius / 60.0;
-	}
-
-	@Override
-	public boolean canTake() {
-		return takeDelay > 0;
-	}
-
-	@Override
-	public void flash() {
-		flashTime = 20;
-	}
-
-	@Override
 	public int getMoney() {
 		return money;
-	}
-
-	@Override
-	public Bitmap getSprite() {
-		return null;
 	}
 
 	public boolean useMoney(int cost) {
@@ -486,34 +403,6 @@ public class Player extends Mob implements LootCollector {
 				* (Math.PI) / 4 + Math.PI / 2)).scale(30));
 	}
 
-	public void pickup(Building b) {
-		level.removeEntity(b);
-		carrying = b;
-		carrying.onPickup();
-		// level.addEntity( new SmokePuffAnimation(b, Art.fxDust12, 40));
-	}
-
-	public void setFacing(int facing) {
-		this.facing = facing;
-	}
-
-	@Override
-	protected boolean shouldBlock(Entity e) {
-		if (carrying != null && e instanceof Bullet
-				&& ((Bullet) e).owner == carrying) {
-			return false;
-		}
-		return true;
-	}
-
-	public void setCanSee(boolean b) {
-		this.isSeeing = b;
-	}
-
-	@Override
-	public void notifySucking() {
-	}
-
 	@Override
 	public void hurt(Entity source, int damage) {
 		if (isImmortal) {
@@ -527,7 +416,7 @@ public class Player extends Mob implements LootCollector {
 			regenDelay = REGEN_INTERVAL;
 
 			if (health <= 0) {
-				MojamComponent.synchronizer.addCommand(new ChatCommand((name + " has died!"),ChatCommand.NOTE_TYPE));
+				handler.notify(name + " has died!");
 				carrying = null;
 				dropAllMoney();
 				pos.set(startX, startY);
@@ -541,25 +430,10 @@ public class Player extends Mob implements LootCollector {
 		}
 	}
 
+
+	
 	@Override
 	public void hurt(Bullet bullet) {
 		hurt(bullet, 1);
-	}
-
-	@Override
-	public String getDeatchSound() {
-		return "/res/sound/Death.wav";
-	}
-
-	public void addScore(int score) {
-		this.score += score;
-		if(score>level.TARGET_SCORE){
-			MojamComponent.synchronizer.addCommand(new EndGameCommand(team));
-		}
-
-	}
-
-	public int getScore() {
-		return score;
 	}
 }

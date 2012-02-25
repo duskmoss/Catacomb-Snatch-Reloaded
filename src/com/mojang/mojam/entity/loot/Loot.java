@@ -2,7 +2,8 @@ package com.mojang.mojam.entity.loot;
 
 import com.mojang.mojam.MojamComponent;
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
@@ -168,7 +169,7 @@ public class Loot extends Entity {
 	@Override
 	public void handleCollision(Entity entity, double xa, double ya) {
 		if (isTakeable && entity instanceof Player) {
-			((Player) entity).take(this);
+			((LocalPlayer) entity).take(this);
 		}
 	}
 
