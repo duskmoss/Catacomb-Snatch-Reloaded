@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.mojang.mojam.network.CommandListener;
 import com.mojang.mojam.network.NetworkCommand;
 
 public class PauseCommand extends NetworkCommand {
@@ -32,6 +33,10 @@ public class PauseCommand extends NetworkCommand {
 
 	public boolean isPause() {
 		return newStatus;
+	}
+	
+	public void handle(int playerId, CommandListener listener){
+		listener.handle(playerId, this);
 	}
 
 }

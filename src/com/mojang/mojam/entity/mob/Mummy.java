@@ -69,7 +69,7 @@ public class Mummy extends Enemy {
 	}
 
 	@Override
-	public String getDeatchSound() {
+	public String getDeathSound() {
 		return "/res/sound/Enemy Death 2.wav";
 	}
 }

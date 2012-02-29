@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.mojang.mojam.network.CommandListener;
 import com.mojang.mojam.network.NetworkCommand;
 
 public class ChangeKeyCommand extends NetworkCommand {
@@ -37,5 +38,9 @@ public class ChangeKeyCommand extends NetworkCommand {
 
 	public boolean getNextState() {
 		return nextState;
+	}
+	
+	public void handle(int playerId, CommandListener listener){
+		listener.handle(playerId, this);
 	}
 }

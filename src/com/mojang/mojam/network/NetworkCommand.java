@@ -8,4 +8,6 @@ public abstract class NetworkCommand extends Packet {
 				"Commands should be handled by the turn synchronizer");
 	}
 
+	public abstract void handle(int playerId, CommandListener commandListener);
+
 }

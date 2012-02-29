@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.mojang.mojam.network.CommandListener;
 import com.mojang.mojam.network.NetworkCommand;
 
 public class ChatCommand extends NetworkCommand {
@@ -46,6 +47,10 @@ public class ChatCommand extends NetworkCommand {
 
 	public int getType() {
 		return message_type;
+	}
+	
+	public void handle(int playerId, CommandListener listener){
+		listener.handle(playerId, this);
 	}
 
 }

@@ -75,7 +75,7 @@ public class TurnSynchronizer {
 							.popPlayerCommands(i, turnSequence);
 					if (commands != null) {
 						for (NetworkCommand command : commands) {
-							commandListener.handle(i, command);
+							command.handle(i, commandListener);
 						}
 					}
 				}

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.mojang.mojam.network.packet.ChangeKeyCommand;
 import com.mojang.mojam.network.packet.ChatCommand;
+import com.mojang.mojam.network.packet.EndGameCommand;
 import com.mojang.mojam.network.packet.PauseCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;

@@ -2,7 +2,8 @@ package com.mojang.mojam.entity.building;
 
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.IUsable;
-import com.mojang.mojam.entity.Player;
+import com.mojang.mojam.entity.player.LocalPlayer;
+import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.math.BB;
 import com.mojang.mojam.network.TurnSynchronizer;
@@ -89,7 +90,7 @@ public class Building extends Mob implements IUsable {
 	private int maxUpgradeLevel = 0;
 	private int[] upgradeCosts = null;
 
-	public boolean upgrade(Player p) {
+	public boolean upgrade(LocalPlayer p) {
 		if (upgradeLevel >= maxUpgradeLevel)
 			return false;
 

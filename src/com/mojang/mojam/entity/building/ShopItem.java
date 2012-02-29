@@ -1,7 +1,7 @@
 package com.mojang.mojam.entity.building;
 
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
+import com.mojang.mojam.entity.player.LocalPlayer;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.screen.Art;
@@ -61,8 +61,8 @@ public class ShopItem extends Building {
 
 	@Override
 	public void use(Entity user) {
-		if (user instanceof Player && ((Player) user).getTeam() == team) {
-			Player player = (Player) user;
+		if (user instanceof LocalPlayer && ((LocalPlayer) user).getTeam() == team) {
+			LocalPlayer player = (LocalPlayer) user;
 			if (player.carrying == null && player.getMoney() >= COST[type]) {
 				player.payCost(COST[type]);
 				Building item = null;

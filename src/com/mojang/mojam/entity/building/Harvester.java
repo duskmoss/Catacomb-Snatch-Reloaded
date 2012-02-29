@@ -3,7 +3,7 @@ package com.mojang.mojam.entity.building;
 import java.util.Random;
 
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.entity.Player;
+import com.mojang.mojam.entity.player.LocalPlayer;
 import com.mojang.mojam.entity.animation.SmokeAnimation;
 import com.mojang.mojam.entity.loot.Loot;
 import com.mojang.mojam.entity.loot.LootCollector;
@@ -21,7 +21,7 @@ public class Harvester extends Building implements LootCollector {
 	private int harvestingTicks = 20;
 	private boolean isHarvesting = false;
 	private boolean isEmptying = false;
-	private Player emptyingPlayer = null;
+	private LocalPlayer emptyingPlayer = null;
 	private int emptyingSpeed = 50;
 	private double radius;
 	private int[] upgradeRadius = new int[] { (int) (1.5 * Tile.WIDTH),
@@ -192,8 +192,8 @@ public class Harvester extends Building implements LootCollector {
 	public void use(Entity user) {
 		super.use(user);
 		isEmptying = true;
-		if (user instanceof Player) {
-			emptyingPlayer = (Player) user;
+		if (user instanceof LocalPlayer) {
+			emptyingPlayer = (LocalPlayer) user;
 		}
 	}
 }

@@ -1,8 +1,11 @@
-package com.mojang.mojam.network;
+package com.mojang.mojam.network.packet;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import com.mojang.mojam.network.CommandListener;
+import com.mojang.mojam.network.NetworkCommand;
 
 public class EndGameCommand extends NetworkCommand {
 
@@ -27,6 +30,10 @@ public class EndGameCommand extends NetworkCommand {
 
 	public int getWinner() {
 		return winner;
+	}
+	
+	public void handle(int playerId, CommandListener listener){
+		listener.handle(playerId, this);
 	}
 
 }
