@@ -40,6 +40,7 @@ import com.mojang.mojam.gui.menu.GuiMenu;
 import com.mojang.mojam.gui.menu.HostingWaitMenu;
 import com.mojang.mojam.gui.menu.InvalidHostMenu;
 import com.mojang.mojam.gui.menu.JoinGameMenu;
+import com.mojang.mojam.gui.menu.LevelSelectMenu;
 import com.mojang.mojam.gui.menu.Overlay;
 import com.mojang.mojam.gui.menu.TitleMenu;
 import com.mojang.mojam.level.Level;
@@ -84,6 +85,9 @@ public class MojamComponent extends Canvas implements Runnable,
 	private int localId;
 	private Thread hostThread;
 	public static SoundPlayer soundPlayer;
+	private static boolean renamed;
+	private static Object renamedFrom;
+	private static Object renamedTo;
 
 	private int createServerState = 0;
 	public boolean showFPS;
@@ -93,6 +97,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	private ChatStack chats = new ChatStack(5);
 	private ChatStack notes = new ChatStack(3);
 	private Thread parentThread;
+	public String levelFile;
+	public boolean ready;
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -178,6 +184,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		}
 		setFocusTraversalKeysEnabled(false);
 		requestFocus();
+		LevelSelectMenu.makeLevelDirectory();
 
 	}
 
@@ -185,7 +192,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		soundPlayer.playMusic(SoundPlayer.BACKGROUND_ID);
 		Player[] players = new Player[2];
 		try {
-			level = Level.fromFile("/res/levels/level1.bmp");
+			level = Level.fromFile(levelFile);
 		} catch (Exception ex) {
 			throw new RuntimeException("Unable to load level", ex);
 		}
@@ -315,6 +322,9 @@ public class MojamComponent extends Canvas implements Runnable,
 				frames = 0;
 				chats.trim();
 				notes.trim();
+				if(renamed){
+					chats.add("Your level "+renamedFrom+" was renamed to "+renamedTo+" because the host had a different version");
+				}
 			}
 		}
 		JPanel panel = (JPanel) getParent();
@@ -439,8 +449,9 @@ public class MojamComponent extends Canvas implements Runnable,
 			handler = new PacketHandler(packetLink, localId, 2, this);
 
 			clearMenus();
+		}
+		if(ready){
 			createLevel();
-
 		}
 	}
 
@@ -467,16 +478,22 @@ public class MojamComponent extends Canvas implements Runnable,
 			getParent().add(mc);
 			mc.start();
 
-		} else if (button.getId() == GuiMenu.START_GAME_ID) {
+		} else if(button.getId() == GuiMenu.HOST_LEVEL_ID){
+			addMenu(new LevelSelectMenu(GAME_WIDTH, GuiMenu.HOST_GAME_ID));
+		} else if(button.getId() == GuiMenu.START_LEVEL_ID){
+			addMenu(new LevelSelectMenu(GAME_WIDTH, GuiMenu.START_GAME_ID));
+		}else if (button.getId() == GuiMenu.START_GAME_ID) {
+			levelFile = ((LevelSelectMenu) menuStack.peek()).getSelection();
 			clearMenus();
             isMultiplayer = false;
 
             localId = Team.Team1;
             handler = new PacketHandler(null, 0, 1, this);
-
+            
             createLevel();
 
 		} else if (button.getId() == GuiMenu.HOST_GAME_ID) {
+			levelFile = ((LevelSelectMenu) menuStack.peek()).getSelection();
 			addMenu(new HostingWaitMenu());
 			isMultiplayer = true;
 			isServer = true;
@@ -634,6 +651,14 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	public void addNote(String message) {
 		notes.push(message);
+		
+	}
+
+	public static void levelWasRenamed(String from, String to) {
+		renamed=true;
+		renamedFrom = from;
+		renamedTo = to;
+		
 		
 	}
 

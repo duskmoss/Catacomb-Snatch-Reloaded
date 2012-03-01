@@ -92,8 +92,6 @@ public abstract class Packet {
 		}
 	}
 
-	public void handle(PacketListener packetListener) {
-		packetListener.handle(this);
-	}
+	public abstract void handle(PacketListener packetListener);
 
 }

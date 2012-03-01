@@ -16,6 +16,9 @@ public abstract class GuiMenu extends GuiComponent implements KeyListener {
 	public static final int EXIT_GAME_ID = 1001;
 	public static final int HOST_GAME_ID = 1002;
 	public static final int JOIN_GAME_ID = 1003;
+	
+	public static final int START_LEVEL_ID = 1017;
+	public static final int HOST_LEVEL_ID = 1018;
 
 	public static final int CANCEL_JOIN_ID = 1004;
 	public static final int PERFORM_JOIN_ID = 1005;

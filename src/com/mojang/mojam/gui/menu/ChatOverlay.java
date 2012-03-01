@@ -40,10 +40,10 @@ public class ChatOverlay extends GuiMenu implements Overlay {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			sendButton.postClick();
 		}
-		if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			message = "";
 			sendButton.postClick();
 		}
@@ -58,7 +58,7 @@ public class ChatOverlay extends GuiMenu implements Overlay {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE && message.length() > 0) {
+		if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && message.length() > 0) {
 			message = message.substring(0, message.length() - 1);
 		} else if (Font.letters.indexOf(Character.toUpperCase(e.getKeyChar())) >= 0) {
 			message += e.getKeyChar();

@@ -42,6 +42,38 @@ public class Bitmap {
 			}
 		}
 	}
+	
+	public void blit(Bitmap bitmap, int x, int y, int scale) {
+		int x0 = x;
+		int x1 = x + bitmap.w*scale;
+		int y0 = y;
+		int y1 = y + bitmap.h*scale;
+		if (x0 < 0)
+			x0 = 0;
+		if (y0 < 0)
+			y0 = 0;
+		if (x1 > w)
+			x1 = w;
+		if (y1 > h)
+			y1 = h;
+		int ww = x1 - x0;
+
+		for (int yy = y0; yy < y1; yy +=scale) {
+			int tp = yy * w + x0;
+			int sp = (yy - y) * bitmap.w + (x0 - x);
+			tp -= sp;
+			for (int xx = sp; xx < sp + ww; xx+=scale) {
+				int col = bitmap.pixels[xx/scale];
+				if (col < 0){
+					for(int j=0;j<scale;j++){
+						for(int i=0;i<scale;i++){
+							pixels[tp + (w*j) + xx + i] = col;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	public void blit(Bitmap bitmap, int x, int y, int www, int hhh) {
 		int x0 = x;

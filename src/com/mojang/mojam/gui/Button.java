@@ -14,7 +14,7 @@ public class Button extends GuiComponent {
 
 	protected final int id;
 	protected boolean performClick = false;
-	private final boolean clickable;
+	protected final boolean clickable;
 
 	public Button(int id) {
 		this.id = id;
@@ -53,7 +53,7 @@ public class Button extends GuiComponent {
 		}
 	}
 
-	private void checkClick(MouseButtons mouseButtons) {
+	protected void checkClick(MouseButtons mouseButtons) {
 		int mx = mouseButtons.getX() / 2;
 		int my = mouseButtons.getY() / 2;
 		isPressed = false;

@@ -1,6 +1,7 @@
 package com.mojang.mojam.screen;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,8 @@ public class Art {
 			32, 32);
 	public static Bitmap[] titles = cut("/res/titles.png", 128);
 	public static Bitmap[][] buttons = cut("/res/buttons/buttons.png", 128, 24);
+	public static Bitmap[][] levelButtons = cut("/res/buttons/levelbuttons.png", 128, 36);
+	public static Bitmap[][] arrowButtons = cut("/res/buttons/arrows.png", 50, 50);
 	public static Bitmap checked = load("/res/buttons/checked.png");
 	public static Bitmap unchecked = load("/res/buttons/unchecked.png");
 	public static Bitmap[][] font = cut("/res/gamfont.png", 8, 8);
@@ -147,8 +150,26 @@ public class Art {
 
 		return 0xff000000 | r << 16 | g << 8 | b;
 	}
+	public static Bitmap extLoad(String string) {
+		try {
+			BufferedImage bi = ImageIO.read(new File(string));
 
-	private static Bitmap load(String string) {
+			int w = bi.getWidth();
+			int h = bi.getHeight();
+
+			Bitmap result = new Bitmap(w, h);
+			bi.getRGB(0, 0, w, h, result.pixels, 0, w);
+
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+
+	public static Bitmap load(String string) {
 		try {
 			BufferedImage bi = ImageIO.read(MojamComponent.class
 					.getResource(string));

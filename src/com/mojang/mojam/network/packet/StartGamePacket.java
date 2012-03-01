@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.mojang.mojam.network.Packet;
+import com.mojang.mojam.network.PacketListener;
 
 public class StartGamePacket extends Packet {
 
@@ -29,5 +30,11 @@ public class StartGamePacket extends Packet {
 
 	public long getGameSeed() {
 		return gameSeed;
+	}
+	
+	@Override
+	public void handle(PacketListener packetListener) {
+		packetListener.handle(this);
+		
 	}
 }

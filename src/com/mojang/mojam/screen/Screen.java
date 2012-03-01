@@ -26,6 +26,11 @@ public class Screen extends Bitmap {
 	public void blit(Bitmap bitmap, int x, int y) {
 		super.blit(bitmap, x + xOffset, y + yOffset);
 	}
+	
+	@Override
+	public void blit(Bitmap bitmap, int x, int y, int scale) {
+		super.blit(bitmap, x + xOffset, y + yOffset, scale);
+	}
 
 	@Override
 	public void blit(Bitmap bitmap, int x, int y, int w, int h) {

@@ -17,9 +17,9 @@ public class TitleMenu extends ScrollingMenu {
 
 		buttonCenter = ((gameWidth - MenuButton.width) / 2);
 
-		addButton(new MenuButton(GuiMenu.START_GAME_ID, 0, buttonCenter,
+		addButton(new MenuButton(GuiMenu.START_LEVEL_ID, 0, buttonCenter,
 				getNextHeight()));
-		addButton(new MenuButton(GuiMenu.HOST_GAME_ID, 2, buttonCenter,
+		addButton(new MenuButton(GuiMenu.HOST_LEVEL_ID, 2, buttonCenter,
 				getNextHeight()));
 		addButton(new MenuButton(JOIN_GAME_ID, 3, buttonCenter, getNextHeight()));
 		addButton(new MenuButton(EXIT_GAME_ID, 1, buttonCenter, getNextHeight()));

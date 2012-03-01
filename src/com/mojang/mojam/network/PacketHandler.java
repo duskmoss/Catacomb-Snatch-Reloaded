@@ -14,7 +14,11 @@ public class PacketHandler implements CommandListener, PacketListener {
 	private PacketLink packetLink;
 	private int GAME_WIDTH=MojamComponent.GAME_WIDTH;
 	private int GAME_HEIGHT=MojamComponent.GAME_HEIGHT;
+
+	@SuppressWarnings("unused")
 	private int localId;
+
+	@SuppressWarnings("unused")
 	private Level level;
 	
 	public PacketHandler(PacketLink pl, int lId, int numPlayers, MojamComponent comp){
@@ -26,7 +30,6 @@ public class PacketHandler implements CommandListener, PacketListener {
 		component = comp;
 		
 		if(packetLink != null){
-			packetLink.sendPacket(new StartGamePacket(TurnSynchronizer.synchedSeed));
 			packetLink.setPacketListener(this);
 		}
 		localId=lId;
@@ -40,33 +43,40 @@ public class PacketHandler implements CommandListener, PacketListener {
 	public void changeKey(int index, boolean nextState) {
 		ChangeKeyCommand command = new ChangeKeyCommand(index, nextState);
 		synchronizer.addCommand(command);
-		handle(localId, command);
 	}
 	
 	public void chat(String message) {
 		ChatCommand command = new ChatCommand(message, ChatCommand.CHAT_TYPE);
 		synchronizer.addCommand(command);
-		handle(localId, command);
 		
 	}
 	
 	public void endGame(int i) {
 		EndGameCommand command = new EndGameCommand(1 - i);
 		synchronizer.addCommand(command);
-		handle(localId, command);
 		
 	}
 	
 	public void pause(boolean b){
 		PauseCommand command = new PauseCommand(b);
 		synchronizer.addCommand(command);
-		handle(localId, command);
 	}
 	
 	public void notify(String message) {
 		ChatCommand command = new ChatCommand(message, ChatCommand.NOTE_TYPE);
 		synchronizer.addCommand(command);
-		handle(localId, command);
+	}
+	
+	public void sendLevel(){
+		packetLink.sendPacket(new LevelPacket(component.levelFile));
+	}
+	
+	public void startGame(){
+		packetLink.sendPacket(new StartGamePacket(TurnSynchronizer.synchedSeed));
+	}
+	
+	private void verifyLevel() {
+		packetLink.sendPacket(new VerifyLevelPacket(component.levelFile));
 	}
 
 	
@@ -120,15 +130,41 @@ public class PacketHandler implements CommandListener, PacketListener {
 	}
 
 	@Override
-	public void handle(Packet packet) {
-		if (packet instanceof StartGamePacket) {
-			if (!component.isServer) {
-				synchronizer.onStartGamePacket((StartGamePacket) packet);
-				component.createLevel();
-			}
-		} else if (packet instanceof TurnPacket) {
-			synchronizer.onTurnPacket((TurnPacket) packet);
+	public void handle(StartGamePacket packet) {
+		if (!component.isServer) {
+			synchronizer.onStartGamePacket((StartGamePacket) packet);
+			component.createLevel();
 		}
+		
+	}
+
+	@Override
+	public void handle(TurnPacket packet) {
+		synchronizer.onTurnPacket((TurnPacket) packet);
+		
+	}
+
+	@Override
+	public void handle(VerifyLevelPacket packet) {
+		component.levelFile = packet.getLevel();
+		boolean verified = packet.verify(component.levelFile);
+		if(component.isServer){
+			if(verified){
+				component.ready = true;
+			}else{
+				sendLevel();
+			}
+		}else{
+			verifyLevel();
+		}
+		
+	}
+
+
+	@Override
+	public void handle(LevelPacket packet) {
+		component.levelFile = packet.getLevel();
+		verifyLevel();
 	}
 
 }

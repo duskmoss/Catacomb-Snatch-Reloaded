@@ -1,6 +1,7 @@
 package com.mojang.mojam.level;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,8 +83,13 @@ public class Level {
 	}
 
 	public static Level fromFile(String path) throws IOException {
-		BufferedImage bufferedImage = ImageIO.read(MojamComponent.class
-				.getResource(path));
+		BufferedImage bufferedImage;
+		if(path.substring(0, 4).equals("/res")){
+			bufferedImage = ImageIO.read(MojamComponent.class.getResource(path));
+		}else{
+			bufferedImage = ImageIO.read(new File(path));
+		}
+				
 		int w = bufferedImage.getWidth() + 16;
 		int h = bufferedImage.getHeight() + 16;
 
