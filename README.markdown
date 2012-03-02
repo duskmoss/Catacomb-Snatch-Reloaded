@@ -2,9 +2,17 @@ Catacomb Snatch Reloaded
 ========================
 A modified and fixed version of Mojang's mojam game Catacomb Snatch.
 
-Currently my improvements feature improved controls, a chat system, a pause screen, and C418's title and ending music. It also contains bug fixes and underlying code improvements.  With my controls you still look the direction you're walking when not firing, but when firing (using the arrow keys) you aim the direction you're firing.  The pause screen can be entered or exited by any player and allows you to surrender or to toggle the fps counter. 
+Major Features:
+Dual Stick Ccontrols
+Chat System
+Pause Screen
+Level Selection
+C418 and Ansou's Title and Ending music
 
-If you find any bugs, have any suggestions at all, or just want to talk email me at {{{rekh127 [at] gmail [dot] com}}}
+It also contains bug fixes and underlying code improvement.
+
+If you find any bugs, have any suggestions at all, or just want to talk email me at 
+	rekh127 [at] gmail [dot] com
 
 A major bug that is still present is the bug with sound on linux. To work around this for now install the Oracle 7 JDK or JRE. To do this on Ubuntu you can use the ppa:webupd8team/java. 
 	sudo add-apt-repository ppa:webupd8team/java
@@ -47,7 +55,8 @@ Cumulative Change log:
 	*Chat System
 	*Hide/Show FPS option on Pause Menu
 	*Dual Stick controls
-	*C418's Title and Ending credits
+	*C418's Title and Anosou's Ending songs
+	*Level select
 	Fixes:
 	*Railcars pickup/drop off locations
 	*Harvester crash bug
@@ -58,3 +67,5 @@ Cumulative Change log:
 	Known Issues:
 	*Sound bugs on linux (missing sounds with sun 6, unstable openjdk6/7)
 	-workaround install Oracle 7 jdk/jre
+	*Open Folder on linux
+	
