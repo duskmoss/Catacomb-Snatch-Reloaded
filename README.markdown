@@ -11,6 +11,8 @@ C418 and Ansou's Title and Ending music
 
 It also contains bug fixes and underlying code improvement.
 
+A good place to find custom levels for download is [here](http://codyshepp.com/cs/levels.php)
+
 If you find any bugs, have any suggestions at all, or just want to talk email me at 
 	rekh127 [at] gmail [dot] com
 
