@@ -25,10 +25,16 @@ public abstract class PathFinder {
 		return getTruePath(gridStart, gridGoal);
 	}
 	
+	public Path getPathNearby(Vec2 strt, Vec2 gl) {
+		Vec2 gridStart=strt.mul(toGrid);
+		Vec2 gridGoal=gl.mul(toGrid);
+		return getTruePathNearby(gridStart, gridGoal);
+	}
+	
 	public abstract Path getTruePath(Vec2 gridStart, Vec2 gridGoal);
 
 	
-	public abstract Path getPathNearby(Vec2 strt, Vec2 gl); 
+	public abstract Path getTruePathNearby(Vec2 gridStart, Vec2 gridGoal); 
 
 	protected boolean canWalk(Vec2 gridPos) {
 		Tile tile = level.getTile((int) gridPos.x, (int) gridPos.y);

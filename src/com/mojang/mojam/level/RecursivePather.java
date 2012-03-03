@@ -38,11 +38,15 @@ public class RecursivePather extends PathFinder {
 		if(start==goal){
 			return new Path(true);
 		}
+		start.visited=true;
 		Path shortestPath=new Path(false);
 		addNeighbors(start);
 		List<Node> neighbors = start.getNeighbors();
 		ArrayList<Path> neighborPaths = new ArrayList<Path>(neighbors.size());
 		for(Node neighbor : neighbors){
+			if(neighbor.visited){
+				continue;
+			}
 			Path neighborPath = getShortestPath(neighbor, goal);
 			if(neighborPath.isFinished){
 				neighborPaths.add(neighborPath);
@@ -59,7 +63,7 @@ public class RecursivePather extends PathFinder {
 	}
 
 	@Override
-	public Path getPathNearby(Vec2 gridStart, Vec2 gridGoal) {
+	public Path getTruePathNearby(Vec2 gridStart, Vec2 gridGoal) {
 		nodes.clear();
 		if (!canWalk(gridStart)){
 			return new Path(false);
@@ -81,6 +85,7 @@ public class RecursivePather extends PathFinder {
 	private Path getShortestPathNearby(Node start, Node goal){
 		Path shortestPath=new Path(false);
 		addNeighbors(start);
+		start.visited=true;
 		List<Node> neighbors = start.getNeighbors();
 		for(Node neighbor : neighbors){
 			if(neighbor==goal){
@@ -89,6 +94,9 @@ public class RecursivePather extends PathFinder {
 		}
 		ArrayList<Path> neighborPaths = new ArrayList<Path>(neighbors.size());
 		for(Node neighbor : neighbors){
+			if(neighbor.visited){
+				continue;
+			}
 			Path neighborPath = getShortestPath(neighbor, goal);
 			if(neighborPath.isFinished){
 				neighborPaths.add(neighborPath);

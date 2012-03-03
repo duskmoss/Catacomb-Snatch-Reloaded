@@ -28,7 +28,7 @@ public class AStar extends PathFinder {
 			return new Path(true);
 
 		PriorityQueue<Node> queue = new PriorityQueue<Node>();
-		queue.add(start);
+		queue.offer(start);
 
 		Path bestPath = new Path(false);
 		while (queue.size() != 0) {
@@ -60,7 +60,7 @@ public class AStar extends PathFinder {
 				neighbor.heuristicDistance = distance + neighbor.pos.dist(goal.pos);
 				neighbor.priority = neighbor.heuristicDistance;
 				if (neighbor.parent == null) {
-					queue.add(neighbor);
+					queue.offer(neighbor);
 				}
 
 				neighbor.parent = current;
@@ -71,7 +71,7 @@ public class AStar extends PathFinder {
 	}
 	
 	@Override
-	public Path getPathNearby(Vec2 strt, Vec2 gl) {
+	public Path getTruePathNearby(Vec2 strt, Vec2 gl) {
 		Vec2 gridStart=strt.mul(toGrid);
 		Vec2 gridGoal=gl.mul(toGrid);
 		nodes.clear();
@@ -95,7 +95,7 @@ public class AStar extends PathFinder {
 		}
 
 		PriorityQueue<Node> queue = new PriorityQueue<Node>();
-		queue.add(start);
+		queue.offer(start);
 
 		Path bestPath = new Path(false);
 		while (queue.size() != 0) {
@@ -108,7 +108,7 @@ public class AStar extends PathFinder {
 
 			neighbors=current.getNeighbors();
 			for(Node node : neighbors){
-				if (start.pos.equals(node.pos)){
+				if (goal.pos.equals(node.pos)){
 					bestPath = reconstructPath(goal);
 					break;
 				}
@@ -132,7 +132,7 @@ public class AStar extends PathFinder {
 						+ distance;
 				if (neighbor.parent == null) {
 					neighbor.priority = neighbor.heuristicDistance;
-					queue.add(neighbor);
+					queue.offer(neighbor);
 				} else{
 					neighbor.priority = neighbor.heuristicDistance;
 				}

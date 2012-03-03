@@ -7,9 +7,9 @@ import java.util.Set;
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.building.Base;
 import com.mojang.mojam.entity.building.TreasurePile;
-import com.mojang.mojam.level.AStar;
 import com.mojang.mojam.level.Path;
 import com.mojang.mojam.level.PathFinder;
+import com.mojang.mojam.level.RecursivePather;
 import com.mojang.mojam.level.tile.RailTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
@@ -47,7 +47,7 @@ public class RailDroid extends Mob {
 		for(Entity pile : tempPiles){
 			treasurePiles.add((TreasurePile) pile);
 		}
-		pathFinder = new AStar(level, this);
+		pathFinder = new RecursivePather(level, this);
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class RailDroid extends Mob {
 			}
 			if(pathFound){
 				Vec2 nextStep = path.getWorldPos(path.getIndex());
-				if(nextStep.dist(pos)<1.5*Tile.WIDTH){
+				if(nextStep.dist(pos)<Tile.WIDTH){
 					path.next();
 					if(path.isDone()){
 						pathFound=false;
@@ -206,16 +206,16 @@ public class RailDroid extends Mob {
 				}
 				double nextX =  nextStep.x-pos.x;
 				double nextY =  nextStep.y-pos.y;
-				if(nextX>.7*Tile.WIDTH&&rr){
+				if(nextX>.5*Tile.WIDTH&&rr){
 					dir=3;
 				}
-				if(nextX<-.7*Tile.WIDTH&&lr){
+				if(nextX<-.5*Tile.WIDTH&&lr){
 					dir=1;
 				}
-				if(nextY>.7*Tile.HEIGHT&&dr){
+				if(nextY>.5*Tile.HEIGHT&&dr){
 					dir=4;
 				}
-				if(nextY<-.7*Tile.HEIGHT&&ur){
+				if(nextY<-.5*Tile.HEIGHT&&ur){
 					dir=2;
 				}
 			}

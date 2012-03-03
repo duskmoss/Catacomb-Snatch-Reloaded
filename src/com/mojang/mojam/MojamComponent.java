@@ -95,7 +95,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	public boolean showFPS;
 	public boolean paused;
 	private boolean chatting;
-	private boolean mouseActive=true;
+	private boolean mouseActive=false;
 
 	private ChatStack chats = new ChatStack(5);
 	private ChatStack notes = new ChatStack(3);
