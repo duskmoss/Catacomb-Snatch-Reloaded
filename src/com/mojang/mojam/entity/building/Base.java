@@ -1,5 +1,6 @@
 package com.mojang.mojam.entity.building;
 
+import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 
@@ -20,6 +21,11 @@ public class Base extends Building {
 	@Override
 	public Bitmap getSprite() {
 		return Art.floorTiles[3][2];
+	}
+	
+	@Override
+	protected boolean shouldBlock(Entity e) {
+		return false;
 	}
 
 	@Override

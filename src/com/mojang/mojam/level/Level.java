@@ -24,6 +24,7 @@ import com.mojang.mojam.entity.player.Player;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.level.tile.DestroyableWallTile;
 import com.mojang.mojam.level.tile.FloorTile;
+import com.mojang.mojam.level.tile.HoleTile;
 import com.mojang.mojam.level.tile.SandTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.level.tile.UnbreakableRailTile;
@@ -49,6 +50,7 @@ public class Level {
 	final int[] neighbourOffsets;
 
 	public List<Player> players = new ArrayList<Player>(2);
+	public static ArrayList<TreasurePile> piles = new ArrayList<TreasurePile>(2);
 
 	@SuppressWarnings("unchecked")
 	public Level(int width, int height) {
@@ -110,34 +112,39 @@ public class Level {
 		bufferedImage.getRGB(0, 0, w - 16, h - 16, rgbs, 8 + 8 * w, w);
 
 		Level l = new Level(h, w);
-
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				int col = rgbs[x + y * w] & 0xffffff;
-
+				
+				
 				Tile tile = new FloorTile();
-				if (col == 0xA8A800) {
+				if (col == Tile.SAND_COLOR) {
 					tile = new SandTile();
-				} else if (col == 0x969696) {
+				} else if (col == Tile.RAIL_COLOR) {
 					tile = new UnbreakableRailTile(new FloorTile());
-				} else if (col == 0x888800) {
+				} else if (col == Tile.UNPASS_COLOR) {
 					tile = new UnpassableSandTile();
-				} else if (col == 0xFF7777) {
+				} else if (col == Tile.DESTROY_COLOR) {
 					tile = new DestroyableWallTile();
-				} else if (col == 0x000000) {
+				} else if (col == Tile.HOLE_COLOR) {
 					tile = new HoleTile();
-				} else if (col == 0xff0000) {
+				} else if (col == Tile.WALL_COLOR) {
 					tile = new WallTile();
-				} else if (col == 0xffff00) {
+				} else if (col == Tile.PILE_COLOR) {
 					TreasurePile t = new TreasurePile(x * Tile.WIDTH + 16, y
-							* Tile.HEIGHT, Team.Neutral);
+							* Tile.HEIGHT+11, Team.Neutral);
 					l.addEntity(t);
+					piles.add(t);
 				}
 
 				l.setTile(x, y, tile);
 			}
 		}
-
+		int treasuresPerPile=(int) (120.0/piles.size());
+		for(TreasurePile pile: piles){
+			pile.setTreasures(treasuresPerPile);
+		}
+		
 		l.setTile(31, 7, new UnbreakableRailTile(new SandTile()));
 		l.setTile(31, 63 - 7, new UnbreakableRailTile(new SandTile()));
 
@@ -291,9 +298,9 @@ public class Level {
 
 	public Set<Entity> getEntities(double xx0, double yy0, double xx1,
 			double yy1, Class<? extends Entity> c) {
-		int x0 = (int) ((xx0) / Tile.WIDTH) - 1;
+		int x0 = (int) ((xx0) / Tile.WIDTH);
 		int x1 = (int) ((xx1) / Tile.WIDTH);
-		int y0 = (int) ((yy0) / Tile.HEIGHT) - 1;
+		int y0 = (int) ((yy0) / Tile.HEIGHT);
 		int y1 = (int) ((yy1) / Tile.HEIGHT);
 
 		Set<Entity> result = new TreeSet<Entity>(new EntityComparator());
@@ -318,6 +325,18 @@ public class Level {
 			}
 		}
 
+		return result;
+	}
+	
+	public ArrayList<Entity> getAllEntities(Class<? extends Entity> c){
+		ArrayList<Entity> result = new ArrayList<Entity>();
+		for (int i = 0; i < entities.size(); i++) {
+			Entity e = entities.get(i);
+			if (c.isInstance(e)){
+				result.add(e);
+			}
+			
+		}
 		return result;
 	}
 
@@ -348,6 +367,7 @@ public class Level {
 
 	public void removeEntity(Entity e) {
 		e.removed = true;
+		entities.remove(e);
 	}
 
 	public void tick() {

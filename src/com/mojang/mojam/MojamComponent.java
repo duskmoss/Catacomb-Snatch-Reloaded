@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -62,7 +63,8 @@ public class MojamComponent extends Canvas implements Runnable,
 	public static final int GAME_HEIGHT = GAME_WIDTH * 3 / 4;
 	public static final int SCALE = 2;
 	private boolean running = true;
-	private Cursor emptyCursor;
+	public Cursor currentCursor;
+	public Cursor emptyCursor;
 	private double framerate = 60;
 	private int fps;
 	private Screen screen = new Screen(GAME_WIDTH, GAME_HEIGHT);
@@ -82,7 +84,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	private ServerSocket serverSocket;
 	private boolean isMultiplayer;
 	public boolean isServer;
-	private int localId;
+	public static int localId;
 	private Thread hostThread;
 	public static SoundPlayer soundPlayer;
 	private static boolean renamed;
@@ -93,12 +95,14 @@ public class MojamComponent extends Canvas implements Runnable,
 	public boolean showFPS;
 	public boolean paused;
 	private boolean chatting;
+	private boolean mouseActive=true;
 
 	private ChatStack chats = new ChatStack(5);
 	private ChatStack notes = new ChatStack(3);
 	private Thread parentThread;
 	public String levelFile;
 	public boolean ready;
+	public int playing=0;
 
 	public MojamComponent() {
 		this.setPreferredSize(new Dimension(GAME_WIDTH * SCALE, GAME_HEIGHT
@@ -119,12 +123,12 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent arg0) {
+	public void mouseDragged(MouseEvent e) {
 		mouseMoved = true;
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {
+	public void mouseMoved(MouseEvent e) {
 		mouseMoved = true;
 	}
 
@@ -173,7 +177,7 @@ public class MojamComponent extends Canvas implements Runnable,
 
 	private void init() {
 		soundPlayer = new SoundPlayer();
-		soundPlayer.playMusic(SoundPlayer.TITLE_ID);
+		playing=soundPlayer.playMusic(SoundPlayer.TITLE_ID);
 
 		try {
 			emptyCursor = Toolkit.getDefaultToolkit().createCustomCursor(
@@ -189,7 +193,7 @@ public class MojamComponent extends Canvas implements Runnable,
 	}
 
 	public synchronized void createLevel() {
-		soundPlayer.playMusic(SoundPlayer.BACKGROUND_ID);
+		playing=soundPlayer.playMusic(SoundPlayer.BACKGROUND_ID);
 		Player[] players = new Player[2];
 		try {
 			level = Level.fromFile(levelFile);
@@ -202,14 +206,13 @@ public class MojamComponent extends Canvas implements Runnable,
 		players[0] = new LocalPlayer(synchedKeys[0], level.width * Tile.WIDTH / 2
 				- 16, (level.height - 5 - 1) * Tile.HEIGHT - 16, Team.Team1, handler);
 		players[0].setFacing(4);
-		level.addEntity(new Base(34 * Tile.WIDTH, 7 * Tile.WIDTH, Team.Team1));
+		level.addEntity(new Base(31*Tile.WIDTH, 57 * Tile.HEIGHT, Team.Team1));
 		level.addPlayer(players[0]);
 		if (isMultiplayer) {
 			players[1] = new LocalPlayer(synchedKeys[1], level.width * Tile.WIDTH
 					/ 2 - 16, 7 * Tile.HEIGHT - 16, Team.Team2, handler);
 			// players[1] = new Player(synchedKeys[1], 10, 10);
-			level.addEntity(new Base(32 * Tile.WIDTH - 20,
-					32 * Tile.WIDTH - 20, Team.Team2));
+			level.addEntity(new Base(31*Tile.WIDTH, 7 * Tile.HEIGHT, Team.Team2));
 
 		} else {
 			players[1] = new ComputerPlayer(level.width * Tile.WIDTH / 2
@@ -218,7 +221,12 @@ public class MojamComponent extends Canvas implements Runnable,
 		level.addPlayer(players[1]);
 		player = (LocalPlayer) players[localId];
         handler.setLevel(level);
-
+        if(mouseActive){
+        	Toolkit toolKit = Toolkit.getDefaultToolkit();
+        	Image image = toolKit.getImage(MojamComponent.class.getResource("/res/ui/cursor.png"));
+        	currentCursor = toolKit.createCustomCursor(image, new Point(10,10), "crosshair");
+        	this.setCursor(currentCursor);
+        }
 	}
 
 	@Override
@@ -323,7 +331,7 @@ public class MojamComponent extends Canvas implements Runnable,
 				chats.trim();
 				notes.trim();
 				if(renamed){
-					chats.add("Your level "+renamedFrom+" was renamed to "+renamedTo+" because the host had a different version");
+					chats.push("Your level "+renamedFrom+" was renamed to "+renamedTo+" because the host had a different version");
 				}
 			}
 		}
@@ -388,7 +396,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		if (handler != null) {
 			handler.tick();
 		}
-
+		mouseButtons.setPosition(getMousePosition());
 		if (level != null) {
 			if (handler.preTurn()) {
 				handler.postTurn();
@@ -401,6 +409,9 @@ public class MojamComponent extends Canvas implements Runnable,
 								handler.changeKey(index, nextState);
 							}
 						}
+					}
+					if(mouseActive&&!mouseHidden){
+						handler.mouseButton(mouseButtons.isDown(1), mouseButtons.getX(), mouseButtons.getY());
 					}
 
 					keys.tick();
@@ -422,16 +433,15 @@ public class MojamComponent extends Canvas implements Runnable,
 				}
 			}
 		}
-		mouseButtons.setPosition(getMousePosition());
 		if (!menuStack.isEmpty()) {
 			menuStack.peek().tick(mouseButtons);
 		}
-		if (mouseMoved) {
+		if (mouseMoved||mouseButtons.isDown(1)) {
 			mouseMoved = false;
 			mouseHideTime = 0;
 			if (mouseHidden) {
 				mouseHidden = false;
-				setCursor(null);
+				setCursor(currentCursor);
 			}
 		}
 		if (mouseHideTime < 60) {
@@ -447,11 +457,18 @@ public class MojamComponent extends Canvas implements Runnable,
 			createServerState = 2;
 			
 			handler = new PacketHandler(packetLink, localId, 2, this);
+			if(levelFile.equals("/res/levels/level1.bmp")){
+				ready=true;
+			}else{
+				handler.verifyLevel();
+			}
 
 			clearMenus();
 		}
 		if(ready){
 			createLevel();
+			handler.startGame();
+			ready=false;
 		}
 	}
 
@@ -479,9 +496,9 @@ public class MojamComponent extends Canvas implements Runnable,
 			mc.start();
 
 		} else if(button.getId() == GuiMenu.HOST_LEVEL_ID){
-			addMenu(new LevelSelectMenu(GAME_WIDTH, GuiMenu.HOST_GAME_ID));
+			addMenu(new LevelSelectMenu(GuiMenu.HOST_GAME_ID));
 		} else if(button.getId() == GuiMenu.START_LEVEL_ID){
-			addMenu(new LevelSelectMenu(GAME_WIDTH, GuiMenu.START_GAME_ID));
+			addMenu(new LevelSelectMenu(GuiMenu.START_GAME_ID));
 		}else if (button.getId() == GuiMenu.START_GAME_ID) {
 			levelFile = ((LevelSelectMenu) menuStack.peek()).getSelection();
 			clearMenus();
@@ -544,6 +561,7 @@ public class MojamComponent extends Canvas implements Runnable,
 				e.printStackTrace();
 			}
 		} else if (button.getId() == GuiMenu.JOIN_GAME_ID) {
+			levelFile =  "/res/levels/level1.bmp";
 			addMenu(new JoinGameMenu());
 		} else if (button.getId() == GuiMenu.CANCEL_JOIN_ID) {
 			popMenu();
@@ -606,7 +624,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		}
 	}
 
-	private void clearMenus() {
+	public void clearMenus() {
 		while (!menuStack.isEmpty()) {
 			menuStack.pop();
 		}

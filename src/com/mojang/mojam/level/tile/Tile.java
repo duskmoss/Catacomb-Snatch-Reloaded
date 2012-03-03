@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.animation.LargeBombExplodeAnimation;
+import com.mojang.mojam.entity.mob.Mob;
+import com.mojang.mojam.entity.mob.RailDroid;
 import com.mojang.mojam.level.Level;
 import com.mojang.mojam.math.BB;
 import com.mojang.mojam.math.BBOwner;
@@ -12,6 +14,17 @@ import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
 public class Tile implements BBOwner {
+	
+	public static final int SAND_COLOR = 0xA8A800;
+	public static final int RAIL_COLOR = 0x969696;
+	public static final int UNPASS_COLOR = 0x888800;
+	public static final int DESTROY_COLOR = 0xFF7777;
+	public static final int HOLE_COLOR = 0x000000;
+	public static final int WALL_COLOR = 0xff0000;
+	public static final int PILE_COLOR = 0xffff00;
+	public static final int FLOOR_COLOR = 0xffffff;
+	
+	
 	public static final int HEIGHT = 32;
 	public static final int WIDTH = 32;
 
@@ -29,6 +42,12 @@ public class Tile implements BBOwner {
 	}
 
 	public boolean canPass(Entity e) {
+		if(e instanceof Mob){
+			Mob m = (Mob) e;
+			if(m instanceof RailDroid){
+				return false;
+			}
+		}
 		return true;
 	}
 

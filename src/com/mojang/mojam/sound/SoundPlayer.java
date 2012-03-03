@@ -61,6 +61,18 @@ public class SoundPlayer {
 	private boolean hasWavPlaybackSupport() {
 		return wavPlaybackSupport && soundSystem != null;
 	}
+	
+	public boolean isPlaying(int id){
+		if (id == BACKGROUND_ID) {
+			return isPlaying(BACKGROUND_TRACK);
+		}else if (id == TITLE_ID) {
+			return isPlaying(TITLE_TRACK);
+		}else if (id == ENDING_ID) {
+			return isPlaying(BACKGROUND_TRACK);
+		}else{
+			return false;
+		}
+	}
 
 	private boolean isPlaying(String sourceName) {
 		if (hasOggPlaybackSupport()) {
@@ -76,7 +88,7 @@ public class SoundPlayer {
 		if (!isMuted() && hasOggPlaybackSupport()) {
 			soundSystem.backgroundMusic(BACKGROUND_TRACK,
 					SoundPlayer.class.getResource(backgroundTrack),
-					backgroundTrack, true);
+					backgroundTrack, false);
 		}
 	}
 
@@ -93,7 +105,7 @@ public class SoundPlayer {
 			soundSystem
 					.backgroundMusic(TITLE_TRACK,
 							SoundPlayer.class.getResource(titleTrack),
-							titleTrack, true);
+							titleTrack, false);
 		}
 	}
 
@@ -109,7 +121,7 @@ public class SoundPlayer {
 		if (!isMuted() && hasOggPlaybackSupport()) {
 			soundSystem.backgroundMusic(ENDING_TRACK,
 					SoundPlayer.class.getResource(endingTrack), endingTrack,
-					true);
+					false);
 		}
 	}
 
@@ -119,11 +131,10 @@ public class SoundPlayer {
 		}
 	}
 
-	public void playMusic(int id) {
+	public int playMusic(int id) {
 		stopMusic();
 		if (id == BACKGROUND_ID) {
 			startBackgroundMusic();
-			return;
 		}
 		if (id == TITLE_ID) {
 			playTitleMusic();
@@ -131,6 +142,7 @@ public class SoundPlayer {
 		if (id == ENDING_ID) {
 			playEndingMusic();
 		}
+		return id;
 
 	}
 

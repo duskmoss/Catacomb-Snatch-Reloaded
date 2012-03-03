@@ -13,4 +13,6 @@ public interface CommandListener {
 	
 	public abstract void handle(int i, ChangeKeyCommand command);
 
+	public abstract void handle(int playerId, MouseCommand mouseCommand);
+
 }

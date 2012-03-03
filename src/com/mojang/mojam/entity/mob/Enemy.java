@@ -15,7 +15,7 @@ public class Enemy extends Mob {
 
 		if (entity instanceof Mob) {
 			Mob mob = (Mob) entity;
-			if (isEnemyOf(mob)) {
+			if (!isFriendOf(mob)) {
 				mob.hurt(this, dmg);
 			}
 		}

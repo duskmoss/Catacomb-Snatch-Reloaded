@@ -6,7 +6,8 @@ import com.mojang.mojam.screen.Bitmap;
 
 public class TreasurePile extends Building {
 
-	private int treasures = 40;
+	private int treasures;
+	private int initial;
 
 	public TreasurePile(double x, double y, int team) {
 		super(x, y, team);
@@ -25,10 +26,37 @@ public class TreasurePile extends Building {
 
 	@Override
 	public Bitmap getSprite() {
-		return Art.treasureTiles[0][0];
+		int percent=(treasures*100/initial);
+		if(percent>67){
+			return Art.treasureTiles[0][0];
+		}else if(percent>33){
+			return Art.treasureTiles[1][0];
+		}else if(percent>0){
+			return Art.treasureTiles[2][0];
+		}else{
+			return Art.treasureTiles[3][0];
+		}
+		
 	}
-
-	public int getRemainingTreasure() {
+	
+	public void setTreasures(int amount){
+		this.treasures=amount;
+		this.initial=amount;
+		
+	}
+	
+	public boolean takeTreasure(){
+		if(treasures>0){
+			treasures--;
+			return true;
+		}else{
+			return false;
+		}
+	}
+	public void addTreasure(){
+		treasures++;
+	}
+	public int getRemainingTreasure(){
 		return treasures;
 	}
 

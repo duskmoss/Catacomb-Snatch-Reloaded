@@ -1,7 +1,15 @@
 package com.mojang.mojam.entity.mob;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+
 import com.mojang.mojam.entity.Entity;
+import com.mojang.mojam.entity.building.Base;
 import com.mojang.mojam.entity.building.TreasurePile;
+import com.mojang.mojam.level.AStar;
+import com.mojang.mojam.level.Path;
+import com.mojang.mojam.level.PathFinder;
 import com.mojang.mojam.level.tile.RailTile;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
@@ -16,16 +24,62 @@ public class RailDroid extends Mob {
 	private int noTurnTime = 0;
 	private int pauseTime = 0;
 	public boolean carrying = false;
+	public boolean pathFound = false;
 	public int swapTime = 0;
+	private ArrayList<TreasurePile> treasurePiles;
+	private Vec2 startingPoint;
+	private PathFinder pathFinder;
+	private Path path;
+	private TreasurePile fromPile;
 
 	public RailDroid(double x, double y) {
 		super(x, y, Team.Neutral);
 		this.setSize(10, 8);
 		deathPoints = 1;
+		startingPoint = pos.clone();
+		
+	}
+	@Override
+	public void init(){
+		super.init();
+		ArrayList<Entity> tempPiles =level.getAllEntities(TreasurePile.class);
+		treasurePiles=new ArrayList<TreasurePile>(tempPiles.size());
+		for(Entity pile : tempPiles){
+			treasurePiles.add((TreasurePile) pile);
+		}
+		pathFinder = new AStar(level, this);
 	}
 
 	@Override
 	public void tick() {
+		if(!pathFound){
+			if(carrying){
+				path=pathFinder.getPath(pos, startingPoint);
+			}else{
+				ArrayList<Path> tempPaths = new ArrayList<Path>(treasurePiles.size());
+				for(int i=0; i<treasurePiles.size(); i++){
+					TreasurePile pile=treasurePiles.get(i);
+					if(pile.getRemainingTreasure()<1){
+						treasurePiles.remove(i);
+					}
+					Path tempPath = pathFinder.getPathNearby(pos, pile.pos);
+					if(tempPath.isFinished){
+						tempPaths.add(tempPath);
+					}
+				}
+				if(!tempPaths.isEmpty()){
+					Collections.sort(tempPaths);
+					path=tempPaths.get(0);
+				}else{
+					path = new Path(false);
+				}
+			}
+			if(path.isFinished && !path.isDone()){
+				pathFound=true;
+				System.out.println("path found!");
+			}
+		}
+		
 
 		xBump = yBump = 0;
 
@@ -57,15 +111,15 @@ public class RailDroid extends Mob {
 		boolean xcenterIsh = xcd * xcd < 2 * 2;
 		boolean ycenterIsh = ycd * ycd < 2 * 2;
 
-		if (!xcenterIsh)
+		if (!xcenterIsh){
 			ur = false;
-		if (!xcenterIsh)
 			dr = false;
+		}
 
-		if (!ycenterIsh)
+		if (!ycenterIsh){
 			lr = false;
-		if (!ycenterIsh)
 			rr = false;
+		}
 
 		int lWeight = 0;
 		int uWeight = 0;
@@ -142,6 +196,29 @@ public class RailDroid extends Mob {
 				else if (res < dWeight)
 					dir = 4;
 			}
+			if(pathFound){
+				Vec2 nextStep = path.getWorldPos(path.getIndex());
+				if(nextStep.dist(pos)<1.5*Tile.WIDTH){
+					path.next();
+					if(path.isDone()){
+						pathFound=false;
+					}
+				}
+				double nextX =  nextStep.x-pos.x;
+				double nextY =  nextStep.y-pos.y;
+				if(nextX>.7*Tile.WIDTH&&rr){
+					dir=3;
+				}
+				if(nextX<-.7*Tile.WIDTH&&lr){
+					dir=1;
+				}
+				if(nextY>.7*Tile.HEIGHT&&dr){
+					dir=4;
+				}
+				if(nextY<-.7*Tile.HEIGHT&&ur){
+					dir=2;
+				}
+			}
 
 			// dir = nd;
 		}
@@ -184,19 +261,30 @@ public class RailDroid extends Mob {
 		}
 
 		if (!carrying && swapTime == 0) {
-			if (level.getEntities(getBB().grow(32), TreasurePile.class).size() > 0) {
+			Set<Entity> pilesInRange = level.getEntities(getBB().grow(32), TreasurePile.class);
+			boolean treasureInRange=false;
+			for(Entity ent : pilesInRange){
+				pathFound = false;
+				TreasurePile pile = (TreasurePile) ent;
+				if(pile.takeTreasure()){
+					treasureInRange=true;
+					fromPile=pile;
+					break;
+				}
+			}
+			if (treasureInRange) {
 				swapTime = 30;
 				carrying = true;
 			}
 		}
 		if (carrying && swapTime == 0) {
-			if (pos.y < 8 * Tile.HEIGHT) {
-				carrying = false;
-				level.addScore(1, 2);
-			}
-			if (pos.y > (level.height - 8) * Tile.HEIGHT) {
-				carrying = false;
-				level.addScore(0, 2);
+			Set<Entity> basesInRange = level.getEntities(getBB().grow(16), Base.class);
+			for(Entity ent : basesInRange){
+				Base base = (Base) ent;
+				carrying=false;
+				fromPile=null;
+				pathFound = false;
+				level.addScore(base.team, 2);
 			}
 		}
 		// level.getTile(xt, yt)
@@ -245,11 +333,26 @@ public class RailDroid extends Mob {
 					boolean tmp = other.carrying;
 					other.carrying = carrying;
 					carrying = tmp;
+					
+					TreasurePile tmpPile = other.fromPile;
+					other.fromPile = fromPile;
+					fromPile = tmpPile;
+					
+					other.pathFound = false;
+					pathFound = false;
+					
 				}
 			}
 		}
 	}
 
+	@Override
+	public void die(){
+		super.die();
+		if(carrying){
+			fromPile.addTreasure();
+		}
+	}
 	@Override
 	protected boolean shouldBlock(Entity e) {
 		// if (e instanceof Player && ((Player) e).team == team) return false;

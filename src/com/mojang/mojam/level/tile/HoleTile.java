@@ -1,8 +1,11 @@
-package com.mojang.mojam.level;
+package com.mojang.mojam.level.tile;
 
 import com.mojang.mojam.entity.Bullet;
 import com.mojang.mojam.entity.Entity;
-import com.mojang.mojam.level.tile.Tile;
+import com.mojang.mojam.entity.mob.Bat;
+import com.mojang.mojam.entity.mob.Enemy;
+import com.mojang.mojam.entity.mob.Mob;
+import com.mojang.mojam.level.Level;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
@@ -32,6 +35,11 @@ public class HoleTile extends Tile {
 
 	@Override
 	public boolean canPass(Entity e) {
+		if(e instanceof Mob){
+			if(e instanceof Enemy){
+				return (e instanceof Bat);
+			}
+		}
 		return (e instanceof Bullet);
 	}
 }

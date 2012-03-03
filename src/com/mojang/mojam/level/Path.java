@@ -6,13 +6,15 @@ import java.util.List;
 import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
 
-public class Path {
+public class Path implements Comparable<Path>{
 
 	public static final Vec2 toWorld = new Vec2(Tile.WIDTH, Tile.HEIGHT);
 
 	public boolean isFinished;
-	List<Node> nodes = new ArrayList<Node>();
+	private List<Node> nodes = new ArrayList<Node>();
 	int index = 0;
+	
+	
 
 	public Path(boolean isFinished) {
 		this.isFinished = isFinished;
@@ -69,5 +71,16 @@ public class Path {
 			s += n.pos.toString() + " ";
 		}
 		return s;
+	}
+
+	@Override
+	public int compareTo(Path other) {
+		if(nodes.size()==other.size()){
+			return 0;
+		}else if(nodes.size()<other.size()){
+			return -1;
+		}else{
+			return 1;
+		}
 	}
 }

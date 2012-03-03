@@ -4,9 +4,11 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mojang.mojam.MojamComponent;
 import com.mojang.mojam.MouseButtons;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.ButtonListener;
+import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.gui.GuiComponent;
 import com.mojang.mojam.screen.Screen;
 
@@ -41,7 +43,12 @@ public abstract class GuiMenu extends GuiComponent implements KeyListener {
 		buttons.add(button);
 		return button;
 	}
-
+	protected int centerText(String text){
+		return ((MojamComponent.GAME_WIDTH-Font.getStringWidth(text))/2);
+	}
+	protected int centerText(String text, int scale){
+		return ((MojamComponent.GAME_WIDTH-Font.getStringWidth(text, scale))/2);
+	}
 	@Override
 	public void render(Screen screen) {
 		super.render(screen);

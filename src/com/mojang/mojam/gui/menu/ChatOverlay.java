@@ -58,7 +58,7 @@ public class ChatOverlay extends GuiMenu implements Overlay {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE && message.length() > 0) {
+		if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE && message.length() > 0) {
 			message = message.substring(0, message.length() - 1);
 		} else if (Font.letters.indexOf(Character.toUpperCase(e.getKeyChar())) >= 0) {
 			message += e.getKeyChar();

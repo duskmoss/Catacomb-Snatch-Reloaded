@@ -46,12 +46,10 @@ public class SpawnerEntity extends Building {
 				* 5;
 		double y = pos.y + (TurnSynchronizer.synchedRandom.nextFloat() - 0.5)
 				* 5;
-		x = Math.max(Math.min(x, level.width * Tile.WIDTH), 0);// spawn only
+		x = Math.max(Math.min(x, ((level.width-10) * Tile.WIDTH)), 10 * Tile.WIDTH);// spawn only
 																// inside the
 																// level!
-		y = Math.max(Math.min(y, level.height * Tile.HEIGHT), 0);
-		// Mob te = new Mummy(x, y);
-
+		y = Math.max(Math.min(y, ((level.height-10) * Tile.HEIGHT)), 10 * Tile.HEIGHT);
 		Mob te = null;
 		if (type == 0)
 			te = new Bat(x, y);

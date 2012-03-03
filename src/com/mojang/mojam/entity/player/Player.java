@@ -1,5 +1,7 @@
 package com.mojang.mojam.entity.player;
 
+import java.awt.Point;
+
 import com.mojang.mojam.entity.Bullet;
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.building.Building;
@@ -9,6 +11,7 @@ import com.mojang.mojam.entity.mob.Mob;
 import com.mojang.mojam.entity.mob.Team;
 import com.mojang.mojam.entity.particle.Sparkle;
 import com.mojang.mojam.level.tile.Tile;
+import com.mojang.mojam.math.Vec2;
 import com.mojang.mojam.network.PacketHandler;
 import com.mojang.mojam.network.TurnSynchronizer;
 import com.mojang.mojam.screen.Art;
@@ -25,7 +28,7 @@ public abstract class Player extends Mob implements LootCollector{
 	protected String name;
 	
 	protected boolean moving, firing;
-	
+	protected int screenW, screenH;
 
 	public boolean flashTime = false;
 	protected int time=0;
@@ -45,7 +48,9 @@ public abstract class Player extends Mob implements LootCollector{
 	protected int suckRadius=0;
 	protected int walkTime=0;
 	protected int score;
-	public int money;
+	public int money=10000;
+	protected Vec2 mouseLocation;
+	protected boolean mouseDown;
 
 
 	public Player(int x, int y, int team) {
@@ -65,6 +70,8 @@ public abstract class Player extends Mob implements LootCollector{
 	public abstract void tick();
 
 	public void render(Screen screen){
+		screenW=screen.w;
+		screenH=screen.h;
 		Bitmap[][] sheet = Art.lordLard;
 		if (team == Team.Team2) {
 			sheet = Art.herrSpeck;
@@ -180,7 +187,7 @@ public abstract class Player extends Mob implements LootCollector{
 	
 	public void addScore(int score) {
 		this.score += score;
-		if(score>level.TARGET_SCORE){
+		if(this.score>=level.TARGET_SCORE){
 			handler.endGame(team);
 		}
 
@@ -188,6 +195,12 @@ public abstract class Player extends Mob implements LootCollector{
 
 	public int getScore() {
 		return score;
+	}
+
+	public void setMouse(boolean down, Point location) {
+		mouseDown = down;
+		mouseLocation = new Vec2(location.x+(pos.x - (screenW / 2)), location.y+(pos.y - ((screenH - 24) / 2)));
+		
 	}
 
 }

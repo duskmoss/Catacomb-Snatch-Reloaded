@@ -12,26 +12,23 @@ import com.mojang.mojam.gui.ArrowButton;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.Font;
 import com.mojang.mojam.gui.MenuButton;
+import com.mojang.mojam.level.tile.*;
 import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Bitmap;
 import com.mojang.mojam.screen.Screen;
 
 public class LevelSelectMenu extends GuiMenu {
 	
-	
-
 	public HashMap<String, String> levels;
 	private HashMap<String, Bitmap> levelImages;
 	private ArrayList<String> levelList;
-	public static File levelDirectory;
+	public static String levelDirectory, fileSeperator;
 	public String currentSelection = "/res/levels/level1.bmp";  
 	private Button selectButton, cancelButton;
 	public boolean reload;
-	private int gameWidth;
 
-	public LevelSelectMenu(int gameWidth, int selectId) {
+	public LevelSelectMenu(int selectId) {
 		super();
-		this.gameWidth = gameWidth;
 		selectButton = addButton(new MenuButton(selectId, selectId-1000, 100, 350));
 		cancelButton = addButton(new MenuButton(GuiMenu.CANCEL_JOIN_ID, 4, 250, 350));
 		loadLevels();
@@ -41,15 +38,11 @@ public class LevelSelectMenu extends GuiMenu {
 		addButton(new ArrowButton(KeyEvent.VK_RIGHT, 450, 150, this));
 	}
 	public static void makeLevelDirectory(){
-		String fileSeperator = System.getProperty("file.separator");
-		if(System.getProperty("os.name").equals("Windows")){
-			levelDirectory = new File(System.getenv("APPDATA")+fileSeperator+"CatacombSnatchReloaded"+fileSeperator+"levels");
-
-		}else{
-			levelDirectory = new File(System.getProperty("user.home")+fileSeperator+".CatacombSnatchReloaded"+fileSeperator+"levels");
-		}
-		if(!levelDirectory.exists()){
-			levelDirectory.mkdirs();
+		fileSeperator = System.getProperty("file.separator");
+		levelDirectory = System.getProperty("user.home")+fileSeperator+".CatacombSnatchReloaded"+fileSeperator+"levels";
+		File levelDir = new File(levelDirectory);
+		if(!levelDir.exists()){
+			levelDir.mkdirs();
 		}
 	}
 
@@ -58,20 +51,22 @@ public class LevelSelectMenu extends GuiMenu {
 		levelImages = new HashMap<String, Bitmap>(1);
 		levelList = new ArrayList<String>(1);
 		levels.put("/res/levels/level1.bmp", "Original");
-		levelImages.put("/res/levels/level1.bmp", Art.load("/res/levels/level1.bmp"));
+		Bitmap image = Art.load("/res/levels/level1.bmp");
+		recolor(image);
+		levelImages.put("/res/levels/level1.bmp", image);
 		levelList.add("/res/levels/level1.bmp");
-		File[] files = levelDirectory.listFiles(new BmpFilter());
+		File levelDir = new File(levelDirectory);
+		File[] files = levelDir.listFiles(new BmpFilter());
 		for(File file : files){
 			String filename = file.getName();
 			filename = filename.substring(0, filename.length()-4);
 			levels.put(file.getPath(), filename);
-			levelImages.put(file.getPath(), Art.extLoad(file.getPath()));
+			image = Art.extLoad(file.getPath());
+			recolor(image);
+			levelImages.put(file.getPath(), image);
 			levelList.add(file.getPath());
 		}
-		for(int i=0; i<levelList.size();i++){
-			String level = levelList.get(i);
-			addButton(new FileButton(i, 30, 60+10*i , level, this));
-		}
+		
 		
 	}
 	
@@ -86,9 +81,17 @@ public class LevelSelectMenu extends GuiMenu {
 			reload=false;
 		}
 		screen.clear(0);
-		Font.draw(screen, "Choose Level:", (gameWidth-Font.getStringWidth("Chose Level:"))/2, 10);
+		screen.blit(Art.backDrop, 0, 0);
+		Font.draw(screen, "Choose level:", centerText("Choose level:", 3), 10, 3);
+		Font.draw(screen, "Additional Levels can be placed in ", 180, 275);
+		Font.draw(screen, levelDirectory, 180, 285);
+		Font.draw(screen, levels.get(currentSelection), 244, 70);
 		screen.blit(levelImages.get(currentSelection), 244, 80, 4);
 		super.render(screen);
+		for(int i=0; i<levelList.size();i++){
+			String level = levelList.get(i);
+			Font.draw(screen, levels.get(level), 30, 60+10*i);
+		}
 	}
 	public void changeSelection(int id) {
 		if(id==KeyEvent.VK_RIGHT){
@@ -107,6 +110,21 @@ public class LevelSelectMenu extends GuiMenu {
 			
 		}
 		
+	}
+	
+	private void recolor(Bitmap map){
+		for(int i=0;i<map.pixels.length;i++){
+			int color=map.pixels[i]& 0xffffff;
+			if(color==Tile.FLOOR_COLOR){
+				map.pixels[i] = Art.floorTileColors[1][0];
+			}else if(color==Tile.WALL_COLOR){
+				map.pixels[i] = Art.wallTileColors[1][0];
+			}else if(color==Tile.HOLE_COLOR){
+				map.pixels[i] = Art.floorTileColors[4][0];
+			}else if(color==Tile.DESTROY_COLOR){
+				map.pixels[i] = Art.destroyWallColor;
+			}
+		}
 	}
 
 	@Override
@@ -134,34 +152,6 @@ public class LevelSelectMenu extends GuiMenu {
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
-
-	private class FileButton extends Button{
-		
-		private LevelSelectMenu menu;
-		private String level, name;
-		
-				
-		public FileButton(int id, int x, int y, String level, LevelSelectMenu menu) {
-			super(id);
-			this.name = menu.levels.get(level);
-			this.x = x;
-			this.y = y;
-			this.w = Font.getStringWidth(name);
-			this.h = 10;
-			this.menu = menu;
-			this.level = level;
-		}
-		@Override
-		public void postClick() {
-			menu.currentSelection = level; 
-		}
-		
-		@Override
-		public void render(Screen screen){
-			Font.draw(screen, name, this.x, this.y);
-		}
-		
-	}
 	
 	private class SpecialButton extends MenuButton{
 		
@@ -175,7 +165,7 @@ public class LevelSelectMenu extends GuiMenu {
 		public void postClick() {
 			if(id==2001){
 				try {
-					Desktop.getDesktop().open(LevelSelectMenu.levelDirectory);
+					Desktop.getDesktop().open(new File(LevelSelectMenu.levelDirectory));
 				} catch (IOException e) {
 					e.printStackTrace();
 				} 

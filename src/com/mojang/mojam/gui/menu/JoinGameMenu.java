@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import com.mojang.mojam.gui.Button;
 import com.mojang.mojam.gui.MenuButton;
 import com.mojang.mojam.gui.Font;
+import com.mojang.mojam.screen.Art;
 import com.mojang.mojam.screen.Screen;
 
 public class JoinGameMenu extends GuiMenu {
@@ -24,6 +25,7 @@ public class JoinGameMenu extends GuiMenu {
 	public void render(Screen screen) {
 
 		screen.clear(0);
+		screen.blit(Art.backDrop, 0, 0);
 		Font.draw(screen, "Enter IP of Host:", 100, textHeight);
 		Font.draw(screen, TitleMenu.ip + "-", 100, textHeight + 20);
 
@@ -47,10 +49,10 @@ public class JoinGameMenu extends GuiMenu {
 	@Override
 	public void keyTyped(KeyEvent e) {
 
-		if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE
+		if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE
 				&& TitleMenu.ip.length() > 0) {
 			TitleMenu.ip = TitleMenu.ip.substring(0, TitleMenu.ip.length() - 1);
-		} else if (Font.letters.indexOf(Character.toUpperCase(e.getKeyCode())) >= 0) {
+		} else if (Font.letters.indexOf(Character.toUpperCase(e.getKeyChar())) >= 0) {
 			TitleMenu.ip += e.getKeyChar();
 		}
 	}

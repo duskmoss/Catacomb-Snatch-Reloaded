@@ -11,6 +11,11 @@ public class Bitmap {
 		this.h = h;
 		pixels = new int[w * h];
 	}
+	public Bitmap(int w, int h, int[] pixels){
+		this.w = w;
+		this.h = h;
+		this.pixels = pixels;
+	}
 
 	public void clear(int color) {
 		Arrays.fill(pixels, color);

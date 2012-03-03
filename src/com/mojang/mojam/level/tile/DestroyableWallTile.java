@@ -16,7 +16,7 @@ public class DestroyableWallTile extends WallTile {
 	@Override
 	public void init(Level level, int x, int y) {
 		super.init(level, x, y);
-		minimapColor = Art.wallTileColors[img % 3][0];
+		minimapColor = Art.destroyWallColor;
 	}
 
 	@Override

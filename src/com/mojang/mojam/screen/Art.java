@@ -15,6 +15,7 @@ public class Art {
 	public static Bitmap[][] wallTiles = cut("/res/floortiles.png", 32, 56, 0,
 			104);
 	public static Bitmap[][] treasureTiles = cut("/res/treasure.png", 32, 56);
+	public static int destroyWallColor = getColors(treasureTiles)[4][0];
 	public static int[][] wallTileColors = getColors(wallTiles);
 
 	public static Bitmap[][] darkness = cut("/res/dark.png", 32, 32);
@@ -33,6 +34,7 @@ public class Art {
 	public static Bitmap titleScreen = load("/res/screen/TITLESCREEN.png");
 	public static Bitmap gameOverScreen = load("/res/screen/game_over.png");
 	public static Bitmap pauseScreen = load("/res/screen/pause.png");
+	public static Bitmap backDrop = load("/res/screen/backdrop.png");
 	public static Bitmap panel = load("/res/panel.png");
 	public static Bitmap shadow = load("/res/shadow.png");
 	public static Bitmap[][] slave = cut("/res/mob/slave.png", 32, 32);

@@ -18,16 +18,29 @@ public class VerifyLevelPacket extends Packet {
 
 	private byte[] md5;
 	private String name;
+	private String fileSeperator;
 	
 	public VerifyLevelPacket() {
+		fileSeperator=LevelSelectMenu.fileSeperator;
 	}
 
 	public VerifyLevelPacket(String lvl) {
+		fileSeperator=LevelSelectMenu.fileSeperator;
 		File level = new File(lvl);
 		name=level.getName();
-		byte[] bytes = null;
+		boolean temp=false;
+		if(!level.exists()){
+			try {
+				level.createNewFile();
+				temp=true;
+			} catch (IOException e) {
+				
+			}
+		}
+		byte[] bytes;
 		try {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(level));
+			bytes=new byte[in.available()];
 			in.read(bytes);
 			in.close();
 			MessageDigest digester = MessageDigest.getInstance("MD5");
@@ -40,6 +53,9 @@ public class VerifyLevelPacket extends Packet {
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		if(temp){
+			level.delete();
 		}
 	}
 	@Override
@@ -63,18 +79,22 @@ public class VerifyLevelPacket extends Packet {
 	}
 	
 	public String getLevel(){
-		String path=LevelSelectMenu.levelDirectory.getPath();
-		File level = new File(path+name);
+		String path=LevelSelectMenu.levelDirectory;
+		File level = new File(path+fileSeperator+name);
 		return level.getPath();
 	}
 	
 	public boolean verify(String lvl) {
 		File level = new File(lvl);
 		name=level.getName();
-		byte[] bytes = null;
+		if(!level.exists()){
+			return false;
+		}
+		byte[] bytes;
 		byte[] localMd5 = null;
 		try {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(level));
+			bytes=new byte[in.available()];
 			in.read(bytes);
 			in.close();
 			MessageDigest digester = MessageDigest.getInstance("MD5");

@@ -141,6 +141,27 @@ public class LocalPlayer extends Player{
 			facing = (int) ((Math.atan2(-xAim, yAim) * 8 / (Math.PI * 2) + 8.5)) & 7;
 		}
 		
+		if (mouseDown) {
+			xAim *= 0.7;
+			yAim *= 0.7;
+			double xMouseDiff=0;
+			if((mouseLocation.x - pos.x)>0.5*Tile.WIDTH){
+				xMouseDiff=1;
+			}else if((mouseLocation.x - pos.x)<-0.5*Tile.WIDTH){
+				xMouseDiff=-1;
+			}
+			double yMouseDiff=0;
+			if((mouseLocation.y - pos.y)>0.5*Tile.HEIGHT){
+				yMouseDiff=1;
+			}else if((mouseLocation.y - pos.y)<-0.5*Tile.HEIGHT){
+				yMouseDiff=-1;
+			}
+			xAim += xMouseDiff;
+			yAim += yMouseDiff;
+			facing = (int) ((Math.atan2(-xAim, yAim) * 8 / (Math.PI * 2) + 8.5)) & 7;
+			firing=mouseDown;
+		}
+		
 		
 
 		if (xa != 0 || ya != 0) {
@@ -273,7 +294,7 @@ public class LocalPlayer extends Player{
 				Vec2 buildPos = pos.clone();
 				Tile tile = level.getTile(buildPos);
 				boolean allowed = false;
-				if (tile != null && tile.isBuildable()) {
+				if (tile != null) {
 					allowed = true;
 				}
 				/*
@@ -329,7 +350,9 @@ public class LocalPlayer extends Player{
 
 		}
 
-		level.reveal(x, y, 5);
+		if(team==MojamComponent.localId){
+			level.reveal(x, y, 5);
+		}
 
 	}
 

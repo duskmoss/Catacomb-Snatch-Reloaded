@@ -1,9 +1,8 @@
 package com.mojang.mojam.gui;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-import java.util.Date;
-import java.util.TreeMap;
 
 import com.mojang.mojam.MojamComponent;
 import com.mojang.mojam.screen.Screen;
@@ -16,7 +15,7 @@ public class ChatStack extends Stack<String> {
 
 	public static final int MAX = 3;
 
-	private Map<String, Long> times = new TreeMap<String, Long>();
+	private Map<String, Long> times = new HashMap<String, Long>();
 
 	private int life;
 	
@@ -34,15 +33,22 @@ public class ChatStack extends Stack<String> {
 
 	@Override
 	public String push(String s) {
+		if(contains(s)){
+			return s;
+		}
 		if (size() == MAX) {
 			cut();
 		}
 		super.push(s);
-		times.put(s, new Date().getTime());
+		times.put(s, System.currentTimeMillis());
 		return s;
 	}
 
-	
+	@Override
+	public boolean add(String s){
+		push(s);
+		return true;
+	}
 	
 	public void render(Screen screen, int x, int y){
 		if(x==CENTER){
@@ -79,7 +85,7 @@ public class ChatStack extends Stack<String> {
 		}
 		String s = get(0);
 		long expTime = times.get(s) + life;
-		long curTime = new Date().getTime();
+		long curTime = System.currentTimeMillis();
 		if (expTime < curTime) {
 			cut();
 		}

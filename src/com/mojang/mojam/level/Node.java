@@ -22,9 +22,9 @@ public class Node implements Comparable<Node> {
 	}
 
 	public int compare(Node n1, Node n2) {
-		if (n1.__priority == n2.__priority)
+		if (n1.priority == n2.priority)
 			return 0;
-		return n1.__priority < n2.__priority ? -1 : 1;
+		return n1.priority < n2.priority ? -1 : 1;
 	}
 
 	@Override
@@ -36,10 +36,10 @@ public class Node implements Comparable<Node> {
 		return (int) pos.x + "_" + (int) pos.y;
 	}
 
-	public boolean __visited = false;
-	public double __pathDistance = 0;
-	public double __heuristicDistance = Double.MAX_VALUE;
-	public Node __parent = null;
-	public double __priority = 0;
+	public boolean visited = false;
+	public double pathDistance = 0;
+	public double heuristicDistance = Double.MAX_VALUE;
+	public Node parent = null;
+	public double priority = 0;
 
 }

@@ -19,15 +19,19 @@ public class LevelPacket extends Packet {
 	
 	private byte[] bytes;
 	private String name;
+	private String fileSeperator;
 	
 	public LevelPacket() {
+		fileSeperator=LevelSelectMenu.fileSeperator;
 	}
 
 	public LevelPacket(String lvl) {
+		fileSeperator=LevelSelectMenu.fileSeperator;
 		File level = new File(lvl);
 		name=level.getName();
 		try {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(level));
+			bytes=new byte[in.available()];
 			in.read(bytes);
 			in.close();
 		} catch (FileNotFoundException e) {
@@ -58,12 +62,12 @@ public class LevelPacket extends Packet {
 	}
 	
 	public String getLevel(){
-		String path=LevelSelectMenu.levelDirectory.getPath();
-		File level = new File(path+name);
+		String path=LevelSelectMenu.levelDirectory;
+		File level = new File(path+fileSeperator+name);
 		if(level.exists()){
-			level.renameTo(new File(path+name+System.currentTimeMillis()));
-			level= new File(path+name);
-			MojamComponent.levelWasRenamed(name,name+System.currentTimeMillis());
+			level.renameTo(new File(path+fileSeperator+System.currentTimeMillis()+name));
+			level= new File(path+fileSeperator+name);
+			MojamComponent.levelWasRenamed(name,System.currentTimeMillis()+name);
 		}
 		try {
 			level.createNewFile();

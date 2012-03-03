@@ -1,31 +1,26 @@
 package com.mojang.mojam.level;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import com.mojang.mojam.entity.mob.Mob;
-import com.mojang.mojam.level.tile.Tile;
 import com.mojang.mojam.math.Vec2;
 
-public class AStar {
-	Level level;
-	Mob mob;
-
-	HashMap<String, Node> nodes = new HashMap<String, Node>();
-
-	private static final Vec2[] dirs = { new Vec2(-1, 0), new Vec2(1, 0),
-			new Vec2(0, 1), new Vec2(0, -1) };
-
+public class AStar extends PathFinder {
 	public AStar(Level level, Mob mob) {
-		this.level = level;
-		this.mob = mob;
+		super(level, mob);
 	}
+	
+	@Override
+	public Path getTruePath(Vec2 gridStart, Vec2 gridGoal){
 
-	public Path getPath(Vec2 gridStart, Vec2 gridGoal) {
 		nodes.clear();
-
-		if (!canWalk(gridStart))
+		if (!canWalk(gridStart)){
 			return new Path(false);
+		}
+		if (!canWalk(gridGoal)){
+			return new Path(false);
+		}
 
 		Node start = createNode(gridStart);
 		Node goal = createNode(gridGoal);
@@ -35,80 +30,128 @@ public class AStar {
 		PriorityQueue<Node> queue = new PriorityQueue<Node>();
 		queue.add(start);
 
-		Path bestPath = null;
+		Path bestPath = new Path(false);
 		while (queue.size() != 0) {
 			Node current = queue.poll();
-			if (current.__visited)
+			if (current.visited)
 				continue;
 
 			if (current == goal) {
-				bestPath = _reconstructPath(goal);
+				bestPath = reconstructPath(goal);
 				break;
 			}
 
 			addNeighbors(current);
-			current.__visited = true;
+			current.visited = true;
 
 			for (Node neighbor : current.getNeighbors()) {
-				if (neighbor.__visited)
+				if (neighbor.visited)
 					continue;
 				if (!canWalk(neighbor.pos))
 					continue;
 
-				double distance = current.__pathDistance
+				double distance = current.pathDistance
 						+ current.pos.dist(neighbor.pos);
-				if (neighbor.__parent != null
-						&& distance >= neighbor.__pathDistance)
+				if (neighbor.parent != null	&& distance >= neighbor.pathDistance){
 					continue;
+				}
 
-				neighbor.__pathDistance = distance;
-				neighbor.__heuristicDistance = neighbor.pos.dist(goal.pos)
-						+ distance;
-				if (neighbor.__parent == null) {
-					neighbor.__priority = neighbor.__heuristicDistance;
+				neighbor.pathDistance = distance;
+				neighbor.heuristicDistance = distance + neighbor.pos.dist(goal.pos);
+				neighbor.priority = neighbor.heuristicDistance;
+				if (neighbor.parent == null) {
 					queue.add(neighbor);
-				} else
-					neighbor.__priority = neighbor.__heuristicDistance;
+				}
 
-				neighbor.__parent = current;
+				neighbor.parent = current;
 			}
 		}
 
-		return bestPath == null ? new Path(false) : bestPath;
+		return bestPath;
 	}
+	
+	@Override
+	public Path getPathNearby(Vec2 strt, Vec2 gl) {
+		Vec2 gridStart=strt.mul(toGrid);
+		Vec2 gridGoal=gl.mul(toGrid);
+		nodes.clear();
+		
+		Node goal = createNode(gridGoal);
+		addNeighbors(goal);
+		List<Node> neighbors = goal.getNeighbors();
+		
+		if (!canWalk(gridStart)){
+			return new Path(false);
+		}
+		if (neighbors.size()==0){
+			return new Path(false);
+		}
 
-	private boolean canWalk(Vec2 gridPos) {
-		Tile tile = level.getTile((int) gridPos.x, (int) gridPos.y);
-		if (tile == null)
-			return false;
-		return tile.canPass(mob);
+		Node start = createNode(gridStart);
+		for(Node node : neighbors){
+			if (start.pos.equals(node.pos)){
+				return new Path(true);
+			}
+		}
+
+		PriorityQueue<Node> queue = new PriorityQueue<Node>();
+		queue.add(start);
+
+		Path bestPath = new Path(false);
+		while (queue.size() != 0) {
+			Node current = queue.poll();
+			if (current.visited)
+				continue;
+
+			addNeighbors(current);
+			current.visited = true;
+
+			neighbors=current.getNeighbors();
+			for(Node node : neighbors){
+				if (start.pos.equals(node.pos)){
+					bestPath = reconstructPath(goal);
+					break;
+				}
+			}
+
+			
+			for (Node neighbor : current.getNeighbors()) {
+				if (neighbor.visited)
+					continue;
+				if (!canWalk(neighbor.pos))
+					continue;
+
+				double distance = current.pathDistance
+						+ current.pos.dist(neighbor.pos);
+				if (neighbor.parent != null
+						&& distance >= neighbor.pathDistance)
+					continue;
+
+				neighbor.pathDistance = distance;
+				neighbor.heuristicDistance = neighbor.pos.dist(goal.pos)
+						+ distance;
+				if (neighbor.parent == null) {
+					neighbor.priority = neighbor.heuristicDistance;
+					queue.add(neighbor);
+				} else{
+					neighbor.priority = neighbor.heuristicDistance;
+				}
+
+				neighbor.parent = current;
+			}
+		}
+
+		return bestPath;	
 	}
+	
 
-	private void addNeighbors(Node n) {
-		Vec2 p = n.pos;
-		for (Vec2 d : dirs)
-			if (canWalk(p.add(d)))
-				n.addNeighbor(getNode(p.add(d)));
-	}
 
-	private Node getNode(Vec2 p) {
-		String hash = Node.getHash(p);
-		Node n = nodes.get(hash);
-		return n == null ? createNode(p) : n;
-	}
-
-	private Node createNode(Vec2 p) {
-		Node n = new Node(p);
-		nodes.put(Node.getHash(p), n);
-		return n;
-	}
-
-	private Path _reconstructPath(Node goalNode) {
+	protected Path reconstructPath(Node goalNode) {
 		Path path = new Path(true);
 		Node node = goalNode;
 		while (node != null) {
 			path.addNodeFront(node);
-			node = node.__parent;
+			node = node.parent;
 		}
 		return path;
 	}

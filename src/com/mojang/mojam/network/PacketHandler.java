@@ -18,7 +18,6 @@ public class PacketHandler implements CommandListener, PacketListener {
 	@SuppressWarnings("unused")
 	private int localId;
 
-	@SuppressWarnings("unused")
 	private Level level;
 	
 	public PacketHandler(PacketLink pl, int lId, int numPlayers, MojamComponent comp){
@@ -52,18 +51,22 @@ public class PacketHandler implements CommandListener, PacketListener {
 	}
 	
 	public void endGame(int i) {
-		EndGameCommand command = new EndGameCommand(1 - i);
+		EndGameCommand command = new EndGameCommand(i);
+		synchronizer.addCommand(command);
+		
+	}
+	public void mouseButton(boolean down, int x, int y) {
+		MouseCommand command = new MouseCommand(down, x/MojamComponent.SCALE, y/MojamComponent.SCALE);
 		synchronizer.addCommand(command);
 		
 	}
 	
-	public void pause(boolean b){
-		PauseCommand command = new PauseCommand(b);
-		synchronizer.addCommand(command);
-	}
-	
 	public void notify(String message) {
 		ChatCommand command = new ChatCommand(message, ChatCommand.NOTE_TYPE);
+		synchronizer.addCommand(command);
+	}
+	public void pause(boolean b){
+		PauseCommand command = new PauseCommand(b);
 		synchronizer.addCommand(command);
 	}
 	
@@ -75,7 +78,7 @@ public class PacketHandler implements CommandListener, PacketListener {
 		packetLink.sendPacket(new StartGamePacket(TurnSynchronizer.synchedSeed));
 	}
 	
-	private void verifyLevel() {
+	public void verifyLevel() {
 		packetLink.sendPacket(new VerifyLevelPacket(component.levelFile));
 	}
 
@@ -104,8 +107,7 @@ public class PacketHandler implements CommandListener, PacketListener {
 
 	@Override
 	public void handle(int playerId, ChangeKeyCommand command) {
-		component.synchedKeys[playerId].getAll().get(command.getKey()).nextState = command.getNextState();
-		
+		component.synchedKeys[playerId].getAll().get(command.getKey()).nextState = command.getNextState();	
 	}
 	public void handle(int playerId, ChatCommand packet) {
 		switch(packet.getType()) {
@@ -117,7 +119,11 @@ public class PacketHandler implements CommandListener, PacketListener {
 	}
 	public void handle(int playerId, EndGameCommand packet) {
 		component.addMenu(new WinMenu(GAME_WIDTH, GAME_HEIGHT, packet.getWinner()));
-		MojamComponent.soundPlayer.playMusic(SoundPlayer.ENDING_ID);
+		component.playing=MojamComponent.soundPlayer.playMusic(SoundPlayer.ENDING_ID);
+	}
+	public void handle(int playerId, MouseCommand packet){
+		level.players.get(playerId).setMouse(packet.isDown(), packet.getLocation());
+		
 	}
 	public void handle(int playerId, PauseCommand packet) {
 		component.paused = packet.isPause();
@@ -125,15 +131,17 @@ public class PacketHandler implements CommandListener, PacketListener {
 			component.addMenu(new PauseMenu(GAME_WIDTH, GAME_HEIGHT, component.showFPS,
 					playerId));
 		} else {
-			component.popMenu();
+			component.clearMenus();
 		}
 	}
+
 
 	@Override
 	public void handle(StartGamePacket packet) {
 		if (!component.isServer) {
 			synchronizer.onStartGamePacket((StartGamePacket) packet);
 			component.createLevel();
+			System.out.println("level created!");
 		}
 		
 	}
@@ -166,5 +174,7 @@ public class PacketHandler implements CommandListener, PacketListener {
 		component.levelFile = packet.getLevel();
 		verifyLevel();
 	}
+
+	
 
 }

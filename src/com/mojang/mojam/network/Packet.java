@@ -10,9 +10,12 @@ import java.util.Map;
 import com.mojang.mojam.network.packet.ChangeKeyCommand;
 import com.mojang.mojam.network.packet.ChatCommand;
 import com.mojang.mojam.network.packet.EndGameCommand;
+import com.mojang.mojam.network.packet.LevelPacket;
+import com.mojang.mojam.network.packet.MouseCommand;
 import com.mojang.mojam.network.packet.PauseCommand;
 import com.mojang.mojam.network.packet.StartGamePacket;
 import com.mojang.mojam.network.packet.TurnPacket;
+import com.mojang.mojam.network.packet.VerifyLevelPacket;
 
 public abstract class Packet {
 
@@ -32,11 +35,15 @@ public abstract class Packet {
 	static {
 		map(10, StartGamePacket.class);
 		map(11, TurnPacket.class);
+		map(12, LevelPacket.class);
+		map(13, VerifyLevelPacket.class);
+		
 
 		map(100, ChangeKeyCommand.class);
 		map(101, PauseCommand.class);
 		map(102, EndGameCommand.class);
 		map(103, ChatCommand.class);
+		map(104, MouseCommand.class);
 	}
 
 	public final int getId() {

@@ -1,5 +1,6 @@
 package com.mojang.mojam.level.tile;
 
+import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.level.Level;
 import com.mojang.mojam.math.Facing;
 import com.mojang.mojam.screen.Art;
@@ -35,8 +36,14 @@ public class RailTile extends Tile {
 
 	@Override
 	public boolean isBuildable() {
+		return false;
+	}
+	
+	@Override
+	public boolean canPass(Entity e){
 		return true;
 	}
+	
 
 	@Override
 	public void neighbourChanged(Tile tile) {
