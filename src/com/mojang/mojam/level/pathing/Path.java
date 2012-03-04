@@ -1,4 +1,4 @@
-package com.mojang.mojam.level;
+package com.mojang.mojam.level.pathing;
 
 import java.util.ArrayList;
 import java.util.List;

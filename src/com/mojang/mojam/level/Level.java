@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 
 import com.mojang.mojam.MojamComponent;
+import com.mojang.mojam.entity.Ai;
 import com.mojang.mojam.entity.Entity;
 import com.mojang.mojam.entity.building.ShopItem;
 import com.mojang.mojam.entity.building.SpawnerEntity;
@@ -50,6 +51,8 @@ public class Level {
 	final int[] neighbourOffsets;
 
 	public List<Player> players = new ArrayList<Player>(2);
+
+	
 	public static ArrayList<TreasurePile> piles = new ArrayList<TreasurePile>(2);
 
 	@SuppressWarnings("unchecked")
@@ -478,6 +481,7 @@ public class Level {
 				}
 			}
 		}
+		path();
 
 		for (Entity e : visibleEntities) {
 			e.render(screen);
@@ -623,6 +627,15 @@ public class Level {
 				/ TARGET_SCORE + "%", 140, screen.h - 20);
 		Font.draw(screen, "Herr Von Speck: " + players.get(1).getScore() * 100
 				/ TARGET_SCORE + "%", 56, screen.h - 36);
+	}
+
+	private void path() {
+		for(Entity e: entities){
+			if(e instanceof Ai){
+				((Ai) e).Path();
+			}
+		}
+		
 	}
 
 	private boolean canSee(int x, int y) {

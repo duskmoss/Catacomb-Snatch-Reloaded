@@ -48,7 +48,7 @@ public abstract class Player extends Mob implements LootCollector{
 	protected int suckRadius=0;
 	protected int walkTime=0;
 	protected int score;
-	public int money=1000;
+	public int money=0;
 	protected Vec2 mouseLocation;
 	protected boolean mouseDown;
 

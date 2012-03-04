@@ -1,13 +1,14 @@
-package com.mojang.mojam.level;
+package com.mojang.mojam.level.pathing;
 
-import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import com.mojang.mojam.entity.mob.Mob;
+import com.mojang.mojam.level.Level;
 import com.mojang.mojam.math.Vec2;
 
-public class AStar extends PathFinder {
-	public AStar(Level level, Mob mob) {
+public class AStarPather extends PathFinder {
+	public AStarPather(Level level, Mob mob) {
 		super(level, mob);
 	}
 	
@@ -24,7 +25,7 @@ public class AStar extends PathFinder {
 
 		Node start = createNode(gridStart);
 		Node goal = createNode(gridGoal);
-		if (start.pos.equals(goal.pos))
+		if (start.equals(goal))
 			return new Path(true);
 
 		PriorityQueue<Node> queue = new PriorityQueue<Node>();
@@ -71,14 +72,12 @@ public class AStar extends PathFinder {
 	}
 	
 	@Override
-	public Path getTruePathNearby(Vec2 strt, Vec2 gl) {
-		Vec2 gridStart=strt.mul(toGrid);
-		Vec2 gridGoal=gl.mul(toGrid);
+	public Path getTruePathNearby(Vec2 gridStart, Vec2 gridGoal) {
 		nodes.clear();
 		
 		Node goal = createNode(gridGoal);
 		addNeighbors(goal);
-		List<Node> neighbors = goal.getNeighbors();
+		Set<Node> neighbors = goal.getNeighbors();
 		
 		if (!canWalk(gridStart)){
 			return new Path(false);
@@ -89,7 +88,7 @@ public class AStar extends PathFinder {
 
 		Node start = createNode(gridStart);
 		for(Node node : neighbors){
-			if (start.pos.equals(node.pos)){
+			if (start.equals(node)){
 				return new Path(true);
 			}
 		}
@@ -100,16 +99,17 @@ public class AStar extends PathFinder {
 		Path bestPath = new Path(false);
 		while (queue.size() != 0) {
 			Node current = queue.poll();
-			if (current.visited)
+			if (current.visited){
 				continue;
+			}
 
 			addNeighbors(current);
 			current.visited = true;
 
-			neighbors=current.getNeighbors();
+			neighbors=goal.getNeighbors();
 			for(Node node : neighbors){
-				if (goal.pos.equals(node.pos)){
-					bestPath = reconstructPath(goal);
+				if (current.equals(node)){
+					bestPath = reconstructPath(node);
 					break;
 				}
 			}
@@ -130,29 +130,35 @@ public class AStar extends PathFinder {
 				neighbor.pathDistance = distance;
 				neighbor.heuristicDistance = neighbor.pos.dist(goal.pos)
 						+ distance;
+				neighbor.priority = neighbor.heuristicDistance;
 				if (neighbor.parent == null) {
-					neighbor.priority = neighbor.heuristicDistance;
+					neighbor.parent = current;
 					queue.offer(neighbor);
 				} else{
-					neighbor.priority = neighbor.heuristicDistance;
+					neighbor.parent = current;
 				}
 
-				neighbor.parent = current;
+				
 			}
 		}
 
 		return bestPath;	
 	}
-	
+
+	@Override
+	public Path getAnyTruePathNearby(Vec2 gridStart, Set<Vec2> gridGoals) {
+		return oneAtATime(gridStart, gridGoals);
+	}
 
 
-	protected Path reconstructPath(Node goalNode) {
+	protected Path reconstructPath(Node lastNode) {
 		Path path = new Path(true);
-		Node node = goalNode;
+		Node node = lastNode;
 		while (node != null) {
 			path.addNodeFront(node);
 			node = node.parent;
 		}
 		return path;
 	}
+
 }

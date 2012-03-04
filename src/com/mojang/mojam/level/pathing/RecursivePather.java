@@ -1,10 +1,11 @@
-package com.mojang.mojam.level;
+package com.mojang.mojam.level.pathing;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 import com.mojang.mojam.entity.mob.Mob;
+import com.mojang.mojam.level.Level;
 import com.mojang.mojam.math.Vec2;
 
 public class RecursivePather extends PathFinder {
@@ -26,23 +27,25 @@ public class RecursivePather extends PathFinder {
 		Node start = createNode(gridStart);
 		Node goal = createNode(gridGoal);
 		
-		if (start.pos.equals(goal.pos)){
+		if (start.equals(goal)){
 			return new Path(true);
-		}
-		
+		}	
 		return getShortestPath(start, goal);		
 		
 	}
 	
 	private Path getShortestPath(Node start, Node goal){
-		if(start==goal){
-			return new Path(true);
-		}
-		start.visited=true;
 		Path shortestPath=new Path(false);
+		if(start.equals(goal)){
+			shortestPath= new Path(true);
+			shortestPath.addNodeFront(start);
+			return shortestPath;
+		}
 		addNeighbors(start);
-		List<Node> neighbors = start.getNeighbors();
+		start.visited=true;
+		Set<Node> neighbors = start.getNeighbors();
 		ArrayList<Path> neighborPaths = new ArrayList<Path>(neighbors.size());
+
 		for(Node neighbor : neighbors){
 			if(neighbor.visited){
 				continue;
@@ -59,6 +62,7 @@ public class RecursivePather extends PathFinder {
 		if(shortestPath.isFinished){
 			shortestPath.addNodeFront(start);
 		}
+		start.visited=false;
 		return shortestPath;
 	}
 
@@ -68,36 +72,36 @@ public class RecursivePather extends PathFinder {
 		if (!canWalk(gridStart)){
 			return new Path(false);
 		}
-		if (!canWalk(gridGoal)){
-			return new Path(false);
-		}
-
 		Node start = createNode(gridStart);
 		Node goal = createNode(gridGoal);
-		
-		if (start.pos.equals(goal.pos)){
-			return new Path(true);
+		addNeighbors(goal);
+		Set<Node> neighbors = goal.getNeighbors();
+		if (neighbors.isEmpty()){
+			return new Path(false);
 		}
-		
 		return getShortestPathNearby(start, goal);		
 	}
 
 	private Path getShortestPathNearby(Node start, Node goal){
 		Path shortestPath=new Path(false);
 		addNeighbors(start);
-		start.visited=true;
-		List<Node> neighbors = start.getNeighbors();
+		Set<Node> neighbors = goal.getNeighbors();
 		for(Node neighbor : neighbors){
-			if(neighbor==goal){
-				return new Path(true);
+			if(neighbor.equals(start)){
+				shortestPath = new Path(true);
+				shortestPath.addNodeFront(neighbor);
+				return shortestPath;
 			}
+		
 		}
+		start.visited=true;
+		neighbors = start.getNeighbors();
 		ArrayList<Path> neighborPaths = new ArrayList<Path>(neighbors.size());
 		for(Node neighbor : neighbors){
 			if(neighbor.visited){
 				continue;
 			}
-			Path neighborPath = getShortestPath(neighbor, goal);
+			Path neighborPath = getShortestPathNearby(neighbor, goal);
 			if(neighborPath.isFinished){
 				neighborPaths.add(neighborPath);
 			}
@@ -109,6 +113,12 @@ public class RecursivePather extends PathFinder {
 		if(shortestPath.isFinished){
 			shortestPath.addNodeFront(start);
 		}
+		start.visited=false;
 		return shortestPath;
+	}
+
+	@Override
+	public Path getAnyTruePathNearby(Vec2 gridStart, Set<Vec2> gridGoals) {
+		return oneAtATime(gridStart, gridGoals);
 	}
 }

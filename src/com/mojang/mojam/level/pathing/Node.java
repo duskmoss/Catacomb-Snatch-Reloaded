@@ -1,13 +1,13 @@
-package com.mojang.mojam.level;
+package com.mojang.mojam.level.pathing;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.mojang.mojam.math.Vec2;
 
 public class Node implements Comparable<Node> {
 	public Vec2 pos;
-	public List<Node> neighbors = new ArrayList<Node>();
+	public Set<Node> neighbors = new HashSet<Node>(4);
 
 	public Node(Vec2 pos) {
 		this.pos = pos.clone().floor();
@@ -17,7 +17,7 @@ public class Node implements Comparable<Node> {
 		neighbors.add(n);
 	}
 
-	public List<Node> getNeighbors() {
+	public Set<Node> getNeighbors() {
 		return neighbors;
 	}
 
@@ -31,7 +31,25 @@ public class Node implements Comparable<Node> {
 	public int compareTo(Node o) {
 		return compare(this, o);
 	}
-
+	
+	
+	public boolean equals(Node other){
+		return other.pos.equals(pos);
+	}
+	@Override
+	public boolean equals(Object o){
+		if(o instanceof Node){
+			Node other = (Node) o;
+			return equals(other);
+		}else{
+			return false;
+		}
+	}
+	
+	public String toString(){
+		return (int) pos.x + "_" + (int) pos.y;
+	}
+	
 	public static String getHash(Vec2 pos) {
 		return (int) pos.x + "_" + (int) pos.y;
 	}
